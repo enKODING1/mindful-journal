@@ -24,6 +24,7 @@ export default function DashboardPage() {
               <h3 className="font-semibold mb-2 text-gray-600">최근 기록</h3>
               <p className="text-sm text-gray-600">아직 기록이 없습니다. 새로운 저널을 시작해보세요!</p>
             </div>
+            <Link href="/write" className="btn btn-primary mt-4 ">작성하기</Link>
           </div>
         );
       case 'info':
@@ -87,27 +88,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex space-x-0">
-            {tabs.map((tab) => (
-              <Link
-                key={tab.id}
-                href={tab.href}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
-                  currentTab === tab.id
-                    ? 'border-blue-500 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                {tab.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-      
+    <div>
       <div className="max-w-4xl mx-auto">
         {renderTabContent()}
       </div>
