@@ -1,4 +1,26 @@
+import { createClient } from '@/app/utils/supabase/server';
+
+interface Content {
+  content: string;
+  mood: string;
+}
+
 export default function WritePage() {
+
+  async function addContent(formData: FormData){
+    'use server';
+    const supabase = await createClient();
+    const content = formData.get('content') as string;
+    const mood = formData.get('mood') as string;
+    console.log("value");
+    console.log(content, mood);
+    const {data, error} = await supabase.from('contents').insert({content, mood});
+    if (error) {
+      console.error('Error inserting content:', error);
+      return;
+    }
+  }
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-600">작성하기</h2>
@@ -7,19 +29,19 @@ export default function WritePage() {
         <p className="text-sm text-gray-600">작성하기</p>
       </div>
 
-      <form>
+      <form action={addContent}>
         <div className="form-control">
           <label className="label">
             <span className="label-text">내용</span>
           </label>
         </div>
         <div className="form-control">
-          <textarea className="textarea textarea-bordered" />
+          <textarea className="textarea textarea-bordered" name='content'/>
         </div>
         <div className="form-control">
           <label className="label">오늘의 기분은 어떠신가요 ?</label>
         </div>
-          <select className="select select-bordered">
+          <select className="select select-bordered" name='mood'>
             <option value="happy">기쁨</option>
             <option value="sad">슬픔</option>
             <option value="angry">화남</option>
