@@ -1,7 +1,9 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import createClient from '@/app/utils/supabase/client';
 
 const tabs = [
   { id: 'home', name: '홈', href: '/dashboard/home' },
@@ -9,9 +11,38 @@ const tabs = [
   { id: 'profile', name: '프로필', href: '/dashboard/profile' },
 ];
 
+interface Content{
+  id: number;
+  created_at: string;
+  content: string;
+  mood: string;
+}
+
+async function getContents(): Promise<Content[]>
+{
+  const supabase = createClient();
+  const {data, error} = await supabase.from('contents').select('*');
+  console.log(data);
+  if(error){
+    console.error('Error fetching contentss:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 export default function DashboardPage() {
   const params = useParams();
+  const [contents, setContents] = useState<Content[]>([]);
   const currentTab = params.tab as string;
+
+  useEffect(() => {
+    const fetchContents = async () => {
+      const data = await getContents();
+      setContents(data);
+    };
+    fetchContents();
+  }, []);
 
   const renderTabContent = () => {
     switch (currentTab) {
@@ -46,6 +77,19 @@ export default function DashboardPage() {
                   <li>• 작은 변화도 기록하기</li>
                 </ul>
               </div>
+            </div>
+            <div className="flex flex-wrap gap-4 mt-4">
+            {
+              contents.map((content) => (
+                <div key={content.id} className="card w-96 bg-base-100 card-xs shadow-sm">
+                <div className="card-body">
+                  <h2 className="card-title">{content.created_at}</h2>
+                  <p>{content.content}</p>
+                <p>{content.mood}</p>
+              </div>
+              </div>
+                ))
+            }
             </div>
           </div>
         );
