@@ -10,15 +10,26 @@ export default function WritePage() {
   async function addContent(formData: FormData){
     'use server';
     const supabase = await createClient();
+    const {data: { user }} = await supabase.auth.getUser();
     const content = formData.get('content') as string;
     const mood = formData.get('mood') as string;
-    console.log("value");
+    const user_id = user?.id;
+
+    console.log(user);
     console.log(content, mood);
-    const {data, error} = await supabase.from('contents').insert({content, mood});
+
+    if (user)
+    {
+
+    // const {data, error} = await supabase.from('contents').insert({content, mood});
+    const {data: postData, error} = await supabase.from('contents').insert({content, mood, user_id});
     if (error) {
       console.error('Error inserting content:', error);
       return;
+    }else{
+      console.log("good");  
     }
+  }
   }
 
   return (
