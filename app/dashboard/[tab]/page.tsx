@@ -55,6 +55,19 @@ export default function DashboardPage() {
               <h3 className="font-semibold mb-2 text-gray-600">최근 기록</h3>
               <p className="text-sm text-gray-600">아직 기록이 없습니다. 새로운 저널을 시작해보세요!</p>
             </div>
+            <div className="flex flex-wrap gap-4 mt-4">
+            {
+              contents.map((content) => (
+                <div key={content.id} className="card w-96 bg-base-100 card-xs shadow-sm">
+                <div className="card-body">
+                  <h2 className="card-title">{content.created_at}</h2>
+                  <p>{content.content}</p>
+                <p>{content.mood}</p>
+              </div>
+              </div>
+                ))
+            }
+            </div>
             <Link href="/write" className="btn btn-primary mt-4 ">작성하기</Link>
           </div>
         );
@@ -78,19 +91,7 @@ export default function DashboardPage() {
                 </ul>
               </div>
             </div>
-            <div className="flex flex-wrap gap-4 mt-4">
-            {
-              contents.map((content) => (
-                <div key={content.id} className="card w-96 bg-base-100 card-xs shadow-sm">
-                <div className="card-body">
-                  <h2 className="card-title">{content.created_at}</h2>
-                  <p>{content.content}</p>
-                <p>{content.mood}</p>
-              </div>
-              </div>
-                ))
-            }
-            </div>
+        
           </div>
         );
       case 'profile':
