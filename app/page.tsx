@@ -14,6 +14,8 @@ export default function Home() {
         >
           저널 시작하기
         </Link>
+        <br></br>
+        <Link className="btn" href="/auth/login">로그인</Link>
       </div>
     </div>
   );
