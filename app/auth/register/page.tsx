@@ -1,19 +1,59 @@
 // app/auth/register/page.tsx
-import createClient from '@/app/utils/supabase/server';
+'use client';
+import { useState } from 'react';
+import createClient from '@/app/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
-    const signUpNewUser = async (formdata: FormData) => {
-        'use server';
-        const email = formdata.get('email')?.toString();
-        const password = formdata.get('password')?.toString();
-        const supabase = await createClient();
-        if (!(email && password)) return;
+    const router = useRouter();
+    const supabase = createClient();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [alias, setAlias] = useState('');
+    const [birth, setBirth] = useState('');
+    const [gender, setGender] = useState('');
+    const [loading, setLoading] = useState(false);
 
-        const { error } = await supabase.auth.signUp({ email, password });
+    const onSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!(email && password)) return;
+        setLoading(true);
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    alias,
+                    birth,
+                    gender,
+                },
+            },
+        });
+        setLoading(false);
         if (error) {
-            console.error('회원가입 실패:', error.message);
+            console.error('회원가입 실패:', { error });
             return;
         }
+        const user_id = data.user;
+        if (data.user) {
+            console.log('회원가입 성공:', user_id?.id);
+
+            const { data, error } = await supabase
+                .from('profiles')
+                .update({ alias, birth, gender })
+                .eq('user_id', '8e952212-699c-4106-87a9-1b65639a7ce1');
+
+            if (error) {
+                console.error('프로필 업데이트 오류:', { error });
+            }
+            console.log('update success:', { data });
+            console.log(birth, alias, gender);
+            if (data) {
+                console.log('데이터 업데이트 성공:', data);
+            }
+        }
+
+        router.push('/auth/login');
     };
 
     return (
@@ -23,13 +63,15 @@ export default function RegisterPage() {
                 <p className="text-lg text-gray-600 mb-8">계정을 만들어 저널을 시작하세요</p>
 
                 <div className="border-1 border-gray-100 rounded-lg p-4 w-100">
-                    <form action={signUpNewUser} className="flex flex-col">
+                    <form onSubmit={onSubmit} className="flex flex-col">
                         <div className="flex flex-col items-start">
                             <label>이메일</label>
                             <input
                                 className="border-1 border-gray-200 rounded-lg p-2 w-full mt-0.5"
                                 name="email"
                                 placeholder="이메일을 입력해주세요"
+                                type="email"
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
 
@@ -40,10 +82,45 @@ export default function RegisterPage() {
                                 name="password"
                                 type="password"
                                 placeholder="비밀번호(6자 이상)"
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col items-start mt-4">
+                            <label>별명</label>
+                            <input
+                                className="border-1 border-gray-200 rounded-lg p-2 w-full mt-0.5"
+                                name="alias"
+                                placeholder="별명"
+                                onChange={(e) => setAlias(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex flex-col items-start mt-4">
+                            <label>성별</label>
+                            <select
+                                name="gender"
+                                id="gender"
+                                onChange={(e) => setGender(e.target.value)}
+                            >
+                                <option value="other">기타</option>
+                                <option value="male">남자</option>
+                                <option value="female">여자</option>
+                                <option value="non-binary">알리고 싶지 않음</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col items-start mt-4">
+                            <label>생일</label>
+                            <input
+                                className="border-1 border-gray-200 rounded-lg p-2 w-full mt-0.5"
+                                name="birthday"
+                                placeholder="생일"
+                                type="date"
+                                onChange={(e) => setBirth(e.target.value)}
                             />
                         </div>
 
-                        <button className="btn mt-4 btn-primary w-full">가입</button>
+                        <button className="btn mt-4 btn-primary w-full" disabled={loading}>
+                            {loading ? '처리 중...' : '가입'}
+                        </button>
                     </form>
                 </div>
             </div>
