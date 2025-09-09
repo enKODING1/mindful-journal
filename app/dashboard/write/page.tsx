@@ -1,4 +1,5 @@
-import { createClient } from '@/app/utils/supabase/server';
+import { redirect } from 'next/navigation';
+import createClient from '../../utils/supabase/server';
 
 // interface Content {
 //   content: string;
@@ -29,6 +30,7 @@ export default function WritePage() {
                 return;
             } else {
                 console.log('good');
+                redirect('/dashboard/home');
             }
         }
     }

@@ -12,7 +12,10 @@ export default function Home({ contents }: { contents: Content[] }) {
             </div>
             <div className="flex flex-wrap gap-4 mt-4">
                 {contents.map((content) => (
-                    <div key={content.id} className="card w-96 bg-base-200 card-xs shadow-sm">
+                    <div
+                        key={content.id}
+                        className="card w-96 bg-base-200 card-xs border border-base-300"
+                    >
                         <div className="card-body">
                             <h2 className="card-title">{content.created_at}</h2>
                             <p>{content.content}</p>
@@ -21,7 +24,7 @@ export default function Home({ contents }: { contents: Content[] }) {
                     </div>
                 ))}
             </div>
-            <Link href="/write" className="btn btn-primary mt-4 ">
+            <Link href="/dashboard/write" className="btn btn-primary mt-4 ">
                 작성하기
             </Link>
         </div>
