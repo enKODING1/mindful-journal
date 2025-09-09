@@ -39,6 +39,7 @@ export default function DashboardPage() {
                 return <Home contents={contents} />;
             case 'info':
                 return <Info />;
+
             case 'profile':
                 return <Profile contents={contents} />;
             default:
