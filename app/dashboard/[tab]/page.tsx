@@ -7,6 +7,7 @@ import { Content } from './types';
 import Home from './Home';
 import Info from './Info';
 import Profile from './Profile';
+import MoodCalendar from './MoodCalendar';
 
 async function getContents(): Promise<Content[]> {
     const supabase = createClient();
@@ -42,6 +43,8 @@ export default function DashboardPage() {
 
             case 'profile':
                 return <Profile contents={contents} />;
+            case 'moodCalendar':
+                return <MoodCalendar></MoodCalendar>;
             default:
                 return (
                     <div className="p-6">

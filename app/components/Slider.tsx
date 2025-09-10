@@ -59,6 +59,9 @@ export default function Slider() {
                     <li>
                         <Link href="/dashboard/profile">Profile</Link>
                     </li>
+                    <li>
+                        <Link href="/dashboard/moodCalendar">Mood Calendar</Link>
+                    </li>
                 </ul>
             </div>
         </div>
