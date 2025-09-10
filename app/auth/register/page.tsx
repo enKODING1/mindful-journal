@@ -34,24 +34,6 @@ export default function RegisterPage() {
             console.error('회원가입 실패:', { error });
             return;
         }
-        const user_id = data.user;
-        if (data.user) {
-            console.log('회원가입 성공:', user_id?.id);
-
-            const { data, error } = await supabase
-                .from('profiles')
-                .update({ alias, birth, gender })
-                .eq('user_id', '8e952212-699c-4106-87a9-1b65639a7ce1');
-
-            if (error) {
-                console.error('프로필 업데이트 오류:', { error });
-            }
-            console.log('update success:', { data });
-            console.log(birth, alias, gender);
-            if (data) {
-                console.log('데이터 업데이트 성공:', data);
-            }
-        }
 
         router.push('/auth/login');
     };
