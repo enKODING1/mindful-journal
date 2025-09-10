@@ -17,11 +17,13 @@ export default async function createClient() {
                 },
                 setAll(cookiesToSet) {
                     try {
+                        // Server Action에서는 쿠키 설정 허용
                         cookiesToSet.forEach(({ name, value, options }) => {
                             cookieStore.set(name, value, options);
                         });
                     } catch (error) {
-                        console.error(error);
+                        // 일반 서버 컴포넌트에서는 쿠키 설정 실패 시 무시
+                        console.log('Cookie setting skipped in server component');
                     }
                 },
             },
