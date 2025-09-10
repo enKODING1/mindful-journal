@@ -17,7 +17,15 @@ export default function Home({ contents }: { contents: Content[] }) {
                         className="card w-96 bg-base-200 card-xs border border-base-300"
                     >
                         <div className="card-body">
-                            <h2 className="card-title">{content.created_at}</h2>
+                            <h2 className="card-title">
+                                {new Date(content.created_at).toLocaleString('ko-KR', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                })}
+                            </h2>
                             <p>{content.content}</p>
                             <p>{content.mood}</p>
                         </div>
