@@ -1,8 +1,13 @@
+export type Mood = 'happy' | 'sad' | 'angry' | 'tired' | 'relaxed';
+export type ContentsByMood = Record<Mood, Content[]>;
+export type SimplifiedContent = Pick<Content, 'created_at' | 'content'>;
+export type SimplifiedContentsByMood = Record<Mood, SimplifiedContent[]>;
+
 export interface Content {
     id: number;
     created_at: string;
     content: string;
-    mood: string;
+    mood: Mood;
 }
 
 export interface Profile {
