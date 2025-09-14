@@ -16,7 +16,10 @@ export default function Home({ contents }: { contents: Content[] }) {
                         key={content.id}
                         className="card w-96 bg-base-200 card-xs border border-base-300"
                     >
-                        <div className="card-body">
+                        <Link
+                            href={`/dashboard/journal/${new Date(content.created_at).toISOString().split('T')[0]}`}
+                            className="card-body"
+                        >
                             <h2 className="card-title">
                                 {new Date(content.created_at).toLocaleString('ko-KR', {
                                     year: 'numeric',
@@ -28,7 +31,7 @@ export default function Home({ contents }: { contents: Content[] }) {
                             </h2>
                             <p>{content.content}</p>
                             <p>{content.mood}</p>
-                        </div>
+                        </Link>
                     </div>
                 ))}
             </div>

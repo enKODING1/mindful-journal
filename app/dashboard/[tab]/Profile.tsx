@@ -220,12 +220,6 @@ export default function Profile({ contents }: { contents: Content[] }) {
                                     <span className="font-medium">총 저널 수:</span> {contentLength}
                                     개
                                 </p>
-                                {profile?.updated_at && (
-                                    <p className="text-xs text-gray-500">
-                                        <span className="font-medium">마지막 수정:</span>{' '}
-                                        {new Date(profile.updated_at).toLocaleDateString('ko-KR')}
-                                    </p>
-                                )}
                             </div>
                         </div>
                     )}
