@@ -28,6 +28,21 @@ async function checkTodayContent() {
     return true;
 }
 
+async function generateComment(content: string, mood: string) {
+    const prompt = `일기내용: ${content}, 오늘의 기분: ${mood}`;
+    const response = await fetch('http://localhost:3000/api/gemini', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+    });
+
+    const data = await response.json();
+    console.log(data.text);
+    return data.text;
+}
+
 export default async function WritePage() {
     // 페이지 로드 시 오늘 이미 작성했는지 체크
     await checkTodayContent();
@@ -41,9 +56,6 @@ export default async function WritePage() {
         const content = formData.get('content') as string;
         const mood = formData.get('mood') as string;
         const user_id = user?.id;
-
-        console.log(user);
-        console.log(content, mood);
 
         if (user) {
             // 한 번 더 체크 (동시 작성 방지)
@@ -60,17 +72,34 @@ export default async function WritePage() {
                 redirect('/dashboard/home?error=already_written');
                 return;
             }
-
-            const { data: error } = await supabase
+            const { data, error } = await supabase
                 .from('contents')
-                .insert({ content, mood, user_id });
+                .insert({ content, mood, user_id })
+                .select('id, created_at')
+                .single();
+
+            const insertData = data;
+
             if (error) {
                 console.error('Error inserting content:', error);
                 return;
             } else {
-                console.log('good');
-                redirect('/dashboard/home');
+                const text = await generateComment(content, mood);
+                const { data, error } = await supabase.from('comments').insert({
+                    content_id: insertData?.id,
+                    comment_type: 'AI',
+                    comment_body: text,
+                    user_id: user_id,
+                });
+
+                if (error) {
+                    console.error('Error:', error);
+                }
             }
+            console.log('good');
+            const date = new Date(insertData?.created_at).toISOString().split('T')[0];
+            console.log(`date: ${data}`);
+            redirect(`/dashboard/journal/${date}`);
         }
     }
 
