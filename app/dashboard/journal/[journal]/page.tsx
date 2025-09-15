@@ -9,7 +9,16 @@ async function getContents(date: string): Promise<Content[]> {
     const supabase = createClient();
     const { data, error } = await supabase
         .from('contents')
-        .select('*')
+        .select(
+            `
+            *,
+            comments!inner(
+            id,
+            comment_body,
+            created_at
+            ) 
+            `,
+        )
         .gte('created_at', `${date}T00:00:00`)
         .lt('created_at', `${date}T23:59:59`);
     if (error) {
@@ -86,6 +95,11 @@ export default function JournalPage() {
                 {/* 일기 내용 */}
                 <div className="text-base-content leading-relaxed text-lg">
                     <p className="whitespace-pre-wrap">{contents.content}</p>
+                </div>
+
+                <div className="bg-green-50 p-4 rounded-lg mt-4">
+                    <h3 className="font-semibold mb-2 text-gray-500 ">마음챙김 봇 답변</h3>
+                    <p className="text-sm text-gray-600">{contents.comments[0].comment_body}</p>
                 </div>
             </div>
         </div>
