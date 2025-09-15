@@ -1,12 +1,37 @@
 import { redirect } from 'next/navigation';
 import createClient from '../../utils/supabase/server';
 
-// interface Content {
-//   content: string;
-//   mood: string;
-// }
+// 오늘 이미 작성했는지 체크하는 함수
+async function checkTodayContent() {
+    const supabase = await createClient();
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
 
-export default function WritePage() {
+    if (!user) {
+        redirect('/auth/login');
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await supabase
+        .from('contents')
+        .select('id')
+        .eq('user_id', user.id)
+        .gte('created_at', `${today}T00:00:00`)
+        .lt('created_at', `${today}T23:59:59`)
+        .limit(1);
+
+    if (data && data.length > 0) {
+        redirect('/dashboard/home?message=already_written');
+    }
+
+    return true;
+}
+
+export default async function WritePage() {
+    // 페이지 로드 시 오늘 이미 작성했는지 체크
+    await checkTodayContent();
+
     async function addContent(formData: FormData) {
         'use server';
         const supabase = await createClient();
@@ -21,7 +46,21 @@ export default function WritePage() {
         console.log(content, mood);
 
         if (user) {
-            // const {data, error} = await supabase.from('contents').insert({content, mood});
+            // 한 번 더 체크 (동시 작성 방지)
+            const today = new Date().toISOString().split('T')[0];
+            const { data: existingContent } = await supabase
+                .from('contents')
+                .select('id')
+                .eq('user_id', user_id)
+                .gte('created_at', `${today}T00:00:00`)
+                .lt('created_at', `${today}T23:59:59`)
+                .limit(1);
+
+            if (existingContent && existingContent.length > 0) {
+                redirect('/dashboard/home?error=already_written');
+                return;
+            }
+
             const { data: error } = await supabase
                 .from('contents')
                 .insert({ content, mood, user_id });
