@@ -76,4 +76,27 @@ describe('WritePage', () => {
         );
         expect(mockRedirect).toHaveBeenCalledWith('/dashboard/home?message=already_written');
     });
+
+    it('오늘 일기가 작성되어있지 않다면 일기작성을 허용한다.', async () => {
+        // Given: 사용자가 로그인되어 있고, 오늘 일기를 작성하지 않은 상태
+        mockSupabaseClient.auth.getUser.mockResolvedValue({
+            data: { user: { id: 'user1' } },
+            error: null,
+        });
+
+        // Supabase 쿼리 체이닝 mock
+        const mockQuery = {
+            data: [], // 작성된 일기가 없음
+            error: null,
+        };
+
+        mockLimit.mockResolvedValue(mockQuery);
+
+        // When: WritePage에 접근할 때
+        const result = await WritePage();
+
+        // Then: 리다이렉트되지 않고 페이지가 렌더링되어야 함
+        expect(mockRedirect).not.toHaveBeenCalled();
+        expect(result).toBeDefined();
+    });
 });
