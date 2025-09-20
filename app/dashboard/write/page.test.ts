@@ -31,11 +31,13 @@ const mockSupabaseClient = {
     from: mockFrom,
 };
 
+// Mock 함수들을 올바르게 설정
 mockCreateClient.mockResolvedValue(mockSupabaseClient as any);
 
 describe('WritePage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        // redirect가 호출되면 에러를 throw하도록 설정
         mockRedirect.mockImplementation((url: string) => {
             throw new Error(`REDIRECT_TO:${url}`);
         });
@@ -51,5 +53,27 @@ describe('WritePage', () => {
         // When & Then: WritePage에 접근할 때 redirect가 호출되어야 함
         await expect(WritePage()).rejects.toThrow('REDIRECT_TO:/auth/');
         expect(mockRedirect).toHaveBeenCalledWith('/auth/login');
+    });
+
+    it('오늘 일기가 이미 작성되어있다면 홈으로 리다이렉트 한다.', async () => {
+        // Given: 사용자가 로그인되어 있고, 오늘 이미 일기를 작성한 상태
+        mockSupabaseClient.auth.getUser.mockResolvedValue({
+            data: { user: { id: 'user1' } },
+            error: null,
+        });
+
+        // Supabase 쿼리 체이닝 mock
+        const mockQuery = {
+            data: [{ id: '1' }], // 이미 작성된 일기가 있음
+            error: null,
+        };
+
+        mockLimit.mockResolvedValue(mockQuery);
+
+        // When & Then: WritePage에 접근할 때 redirect가 호출되어야 함
+        await expect(WritePage()).rejects.toThrow(
+            'REDIRECT_TO:/dashboard/home?message=already_written',
+        );
+        expect(mockRedirect).toHaveBeenCalledWith('/dashboard/home?message=already_written');
     });
 });
