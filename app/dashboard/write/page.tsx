@@ -1,32 +1,6 @@
 import { redirect } from 'next/navigation';
 import createClient from '../../utils/supabase/server';
-
-// 오늘 이미 작성했는지 체크하는 함수
-async function checkTodayContent() {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-        redirect('/auth/login');
-    }
-
-    const today = new Date().toISOString().split('T')[0];
-    const { data } = await supabase
-        .from('contents')
-        .select('id')
-        .eq('user_id', user.id)
-        .gte('created_at', `${today}T00:00:00`)
-        .lt('created_at', `${today}T23:59:59`)
-        .limit(1);
-
-    if (data && data.length > 0) {
-        redirect('/dashboard/home?message=already_written');
-    }
-
-    return true;
-}
+import { checkTodayContent } from '@/app/services/auth';
 
 async function generateComment(content: string, mood: string) {
     const prompt = `일기내용: ${content}, 오늘의 기분: ${mood}`;
