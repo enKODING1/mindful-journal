@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ChangeEvent, useState } from 'react';
 import createClient from '../../utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import GoogleLoginButton from '@/app/components/GoogleLoginButton';
 
 export default function Home() {
     const router = useRouter();
@@ -11,7 +12,7 @@ export default function Home() {
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
-        const supabase = await createClient();
+        const supabase = createClient();
 
         if (!(email && password)) {
             console.error('form is blank');
@@ -70,6 +71,7 @@ export default function Home() {
                             <button className="btn mt-4 btn-primary w-full" onClick={handleLogin}>
                                 로그인
                             </button>
+                            <GoogleLoginButton />
                         </div>
                         <div className="flex items-center mt-12 justify-center gap-1">
                             <p className="text-sm text-gray-600">아직 회원이 아니신가요?</p>
