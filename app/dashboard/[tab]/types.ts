@@ -8,6 +8,14 @@ export interface Content {
     created_at: string;
     content: string;
     mood: Mood;
+    comments?: Comment[];
+}
+
+export interface Comment {
+    id: number;
+    content_id: number;
+    comment_body: string;
+    created_at: string;
 }
 
 export interface Profile {

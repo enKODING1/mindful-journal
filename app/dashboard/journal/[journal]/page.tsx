@@ -97,10 +97,12 @@ export default function JournalPage() {
                     <p className="whitespace-pre-wrap">{contents.content}</p>
                 </div>
 
-                <div className="bg-green-50 p-4 rounded-lg mt-4">
-                    <h3 className="font-semibold mb-2 text-gray-500 ">마음챙김 봇 답변</h3>
-                    <p className="text-sm text-gray-600">{contents.comments[0].comment_body}</p>
-                </div>
+                {contents.comments && contents.comments.length > 0 && (
+                    <div className="bg-green-50 p-4 rounded-lg mt-4">
+                        <h3 className="font-semibold mb-2 text-gray-500 ">마음챙김 봇 답변</h3>
+                        <p className="text-sm text-gray-600">{contents.comments[0].comment_body}</p>
+                    </div>
+                )}
             </div>
         </div>
     );
