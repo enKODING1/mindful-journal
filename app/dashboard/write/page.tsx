@@ -30,7 +30,7 @@ async function checkTodayContent() {
 
 async function generateComment(content: string, mood: string) {
     const prompt = `일기내용: ${content}, 오늘의 기분: ${mood}`;
-    const response = await fetch('http://localhost:3000/api/gemini', {
+    const response = await fetch(`${process.env.SITE_URL}/api/gemini`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
