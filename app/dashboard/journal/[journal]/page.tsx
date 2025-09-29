@@ -51,7 +51,7 @@ export default function JournalPage() {
             setContents(data[0]);
         };
         fetchContent();
-    }, []);
+    }, [params.journal]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('ko-KR', {

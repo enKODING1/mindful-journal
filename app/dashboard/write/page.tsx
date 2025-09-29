@@ -85,7 +85,7 @@ export default async function WritePage() {
                 return;
             } else {
                 const text = await generateComment(content, mood);
-                const { data, error } = await supabase.from('comments').insert({
+                const { error } = await supabase.from('comments').insert({
                     content_id: insertData?.id,
                     comment_type: 'AI',
                     comment_body: text,

@@ -28,8 +28,3 @@ export async function GET(request: Request) {
 
     return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }
-
-async function signOut() {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.signOut();
-}

@@ -21,7 +21,7 @@ export default async function createClient() {
                         cookiesToSet.forEach(({ name, value, options }) => {
                             cookieStore.set(name, value, options);
                         });
-                    } catch (error) {
+                    } catch {
                         // 일반 서버 컴포넌트에서는 쿠키 설정 실패 시 무시
                         console.log('Cookie setting skipped in server component');
                     }

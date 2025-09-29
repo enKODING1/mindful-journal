@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Content } from './types';
-import { Day, DayPicker } from 'react-day-picker';
+import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import createClient from '../../utils/supabase/client';
 import { groupContentsByMood } from '@/app/utils/contentUtils';
@@ -65,8 +65,6 @@ export default function MoodCalendar() {
      *
      * }
      * */
-
-    const journalDates = [new Date(2025, 8, 1), new Date(2025, 8, 24)];
 
     return (
         <div className="p-6">

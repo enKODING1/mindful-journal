@@ -8,7 +8,7 @@ import createClient from '../utils/supabase/client';
 export default function Slider() {
     const router = useRouter();
     const supabase = createClient();
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
 
     useEffect(() => {
         let isMounted = true;

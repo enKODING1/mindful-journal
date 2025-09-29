@@ -1,10 +1,4 @@
-import {
-    Mood,
-    ContentsByMood,
-    Content,
-    SimplifiedContent,
-    SimplifiedContentsByMood,
-} from '../dashboard/[tab]/types';
+import { Mood, Content, SimplifiedContentsByMood } from '../dashboard/[tab]/types';
 
 // utils/contentUtils.ts
 export const groupContentsByMood = (contents: Content[]): SimplifiedContentsByMood => {
