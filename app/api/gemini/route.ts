@@ -10,13 +10,13 @@ export async function POST(req: Request) {
     try {
         const { prompt } = await req.json();
         const fullPrompt = `${systemInstruction}\n\n[사용자 질문]\n${prompt}`;
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const result = await model.generateContent(fullPrompt);
         const text = result.response.text();
 
         return NextResponse.json({ text });
     } catch (error) {
         console.error(error);
-        return new NextResponse('Something went wrong', { status: 500 });
+        return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
     }
 }

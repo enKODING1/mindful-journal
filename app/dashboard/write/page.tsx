@@ -38,7 +38,18 @@ async function generateComment(content: string, mood: string) {
         body: JSON.stringify({ prompt }),
     });
 
+    if (!response.ok) {
+        console.error('API 요청 실패:', response.status);
+        return 'AI 댓글 생성에 실패했습니다.';
+    }
+
     const data = await response.json();
+
+    if (data.error) {
+        console.error('API 오류:', data.error);
+        return 'AI 댓글 생성에 실패했습니다.';
+    }
+
     console.log(data.text);
     return data.text;
 }
