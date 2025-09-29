@@ -8,6 +8,9 @@ export default function GoogleLoginButton() {
     const handleLogin = async () => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback?next=/dashboard/home`,
+            },
         });
 
         if (error) {
