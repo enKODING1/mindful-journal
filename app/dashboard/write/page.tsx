@@ -115,68 +115,70 @@ export default async function WritePage() {
     }
 
     return (
-        <div className="p-6 w-[60%] m-auto">
-            <h2 className="text-2xl font-bold mb-4">작성하기</h2>
+        <div className="min-h-screen bg-base-100 text-base-content p-8">
+            <div className="max-w-2xl mx-auto">
+                <h2 className="text-2xl font-bold mb-4">작성하기</h2>
 
-            <form action={addContent} className="space-y-6">
-                {/* 일기 내용 섹션 */}
-                <div className="bg-base-200 text-base-content p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2">오늘의 이야기</h3>
-                    <div className="form-control">
-                        <textarea
-                            className="textarea textarea-bordered h-32 resize-none w-full"
-                            name="content"
-                            placeholder="오늘 하루는 어땠나요? 특별한 일이나 생각이 있었다면 자유롭게 적어보세요..."
-                            required
-                        />
+                <form action={addContent} className="space-y-6">
+                    {/* 일기 내용 섹션 */}
+                    <div className="bg-base-200 text-base-content p-4 rounded-lg">
+                        <h3 className="font-semibold mb-2">오늘의 이야기</h3>
+                        <div className="form-control">
+                            <textarea
+                                className="textarea textarea-bordered h-32 resize-none w-full"
+                                name="content"
+                                placeholder="오늘 하루는 어땠나요? 특별한 일이나 생각이 있었다면 자유롭게 적어보세요..."
+                                required
+                            />
+                        </div>
                     </div>
-                </div>
 
-                {/* 기분 선택 섹션 */}
-                <div className="bg-base-200 text-base-content p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2">오늘의 기분은 어떠신가요?</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                        {[
-                            { value: 'happy', emoji: '😊', label: '기쁨' },
-                            { value: 'sad', emoji: '😢', label: '슬픔' },
-                            { value: 'angry', emoji: '😠', label: '화남' },
-                            { value: 'tired', emoji: '😴', label: '피곤' },
-                            { value: 'relaxed', emoji: '😌', label: '편안' },
-                        ].map((mood) => (
-                            <label key={mood.value} className="cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="mood"
-                                    value={mood.value}
-                                    className="sr-only peer"
-                                    required
-                                />
-                                <div className="card bg-base-100 border-2 border-base-300 peer-checked:border-primary peer-checked:bg-primary/10 hover:bg-base-100/80 transition-colors">
-                                    <div className="card-body p-3 text-center">
-                                        <div className="text-2xl mb-1">{mood.emoji}</div>
-                                        <div className="text-xs font-medium">{mood.label}</div>
+                    {/* 기분 선택 섹션 */}
+                    <div className="bg-base-200 text-base-content p-4 rounded-lg">
+                        <h3 className="font-semibold mb-2">오늘의 기분은 어떠신가요?</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            {[
+                                { value: 'happy', emoji: '😊', label: '기쁨' },
+                                { value: 'sad', emoji: '😢', label: '슬픔' },
+                                { value: 'angry', emoji: '😠', label: '화남' },
+                                { value: 'tired', emoji: '😴', label: '피곤' },
+                                { value: 'relaxed', emoji: '😌', label: '편안' },
+                            ].map((mood) => (
+                                <label key={mood.value} className="cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="mood"
+                                        value={mood.value}
+                                        className="sr-only peer"
+                                        required
+                                    />
+                                    <div className="card bg-base-100 border-2 border-base-300 peer-checked:border-primary peer-checked:bg-primary/10 hover:bg-base-100/80 transition-colors">
+                                        <div className="card-body p-3 text-center">
+                                            <div className="text-2xl mb-1">{mood.emoji}</div>
+                                            <div className="text-xs font-medium">{mood.label}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </label>
-                        ))}
+                                </label>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                {/* 제출 버튼 */}
-                <div className="flex justify-center">
-                    <button type="submit" className="btn btn-primary">
-                        기록하기
-                    </button>
-                </div>
-            </form>
+                    {/* 제출 버튼 */}
+                    <div className="flex justify-center">
+                        <button type="submit" className="btn btn-primary">
+                            기록하기
+                        </button>
+                    </div>
+                </form>
 
-            {/* 도움말 카드 */}
-            <div className="bg-base-300 text-base-content p-4 rounded-lg mt-6">
-                <h3 className="font-semibold mb-2">💭 작은 팁</h3>
-                <p className="text-sm">
-                    매일 일기를 쓰는 것은 마음의 건강에 도움이 됩니다. 좋은 일이든 힘든 일이든
-                    솔직하게 기록해보세요. 시간이 지나면 소중한 추억과 성장의 기록이 될 거예요.
-                </p>
+                {/* 도움말 카드 */}
+                <div className="bg-base-300 text-base-content p-4 rounded-lg mt-6">
+                    <h3 className="font-semibold mb-2">💭 작은 팁</h3>
+                    <p className="text-sm">
+                        매일 일기를 쓰는 것은 마음의 건강에 도움이 됩니다. 좋은 일이든 힘든 일이든
+                        솔직하게 기록해보세요. 시간이 지나면 소중한 추억과 성장의 기록이 될 거예요.
+                    </p>
+                </div>
             </div>
         </div>
     );
