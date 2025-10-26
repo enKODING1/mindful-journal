@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Home, Info, User, Calendar, LogOut, Menu } from 'lucide-react';
-import createClient from '../utils/supabase/client';
+import createClient from '@/app/utils/supabase/client';
 
 export default function Slider() {
     const router = useRouter();

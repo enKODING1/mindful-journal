@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ChangeEvent, useState } from 'react';
 import createClient from '../../utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import GoogleLoginButton from '@/app/components/GoogleLoginButton';
+import GoogleLoginButton from '@/components/GoogleLoginButton';
 
 export default function Home() {
     const router = useRouter();
