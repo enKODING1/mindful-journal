@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Edit3, Save, X } from 'lucide-react';
-import { Content, Profile as ProfileType, ProfileFormData } from './types';
+// import { Content, Profile as ProfileType, ProfileFormData } from './types';
+import { Content, Profile as ProfileType, ProfileFormData } from '@/store/models';
 import createClient from '@/app/utils/supabase/client';
 
 export default function Profile({ contents }: { contents: Content[] }) {

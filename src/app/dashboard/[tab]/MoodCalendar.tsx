@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Content } from './types';
+// import { Content } from './types';
+import { Content } from '@/store/models';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import createClient from '../../utils/supabase/client';

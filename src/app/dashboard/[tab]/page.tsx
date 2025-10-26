@@ -3,7 +3,8 @@
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import createClient from '@/app/utils/supabase/client';
-import { Content } from './types';
+// import { Content } from './types';
+import { Content } from '@/store/models';
 import Home from './Home';
 import Info from './Info';
 import Profile from './Profile';
