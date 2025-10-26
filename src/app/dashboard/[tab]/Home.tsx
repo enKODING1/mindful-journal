@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Content } from './types';
+import { Content } from '@/store/models';
 
 export default function Home({ contents }: { contents: Content[] }) {
     const searchParams = useSearchParams();
