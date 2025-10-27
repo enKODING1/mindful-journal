@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Content } from '@/store/models';
+import { formatJournalDate, getJournalCardDate, hasWrittenToday } from '@/store/utils';
 
 export default function Home({ contents }: { contents: Content[] }) {
     const searchParams = useSearchParams();
@@ -32,10 +33,6 @@ export default function Home({ contents }: { contents: Content[] }) {
             return () => clearTimeout(timer);
         }
     }, [searchParams]);
-
-    // 오늘 작성한 일기가 있는지 체크
-    const today = new Date().toISOString().split('T')[0];
-    const hasWrittenToday = contents.some((content) => content.created_at.startsWith(today));
 
     return (
         <div className="p-6">
@@ -67,18 +64,10 @@ export default function Home({ contents }: { contents: Content[] }) {
                         className="card w-96 bg-base-200 card-xs border border-base-300"
                     >
                         <Link
-                            href={`/dashboard/journal/${new Date(content.created_at).toISOString().split('T')[0]}`}
+                            href={`/dashboard/journal/${formatJournalDate(content.created_at)}`}
                             className="card-body"
                         >
-                            <h2 className="card-title">
-                                {new Date(content.created_at).toLocaleString('ko-KR', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                })}
-                            </h2>
+                            <h2 className="card-title">{getJournalCardDate(content.created_at)}</h2>
                             <p>{content.content}</p>
                             <p>{content.mood}</p>
                         </Link>
@@ -87,7 +76,7 @@ export default function Home({ contents }: { contents: Content[] }) {
             </div>
 
             {/* 작성하기 버튼 - 오늘 이미 작성했으면 비활성화 */}
-            {hasWrittenToday ? (
+            {hasWrittenToday(contents) ? (
                 <div className="mt-4">
                     <button className="btn btn-disabled" disabled>
                         오늘 일기 작성 완료 ✅

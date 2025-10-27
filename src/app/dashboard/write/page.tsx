@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import createClient from '../../utils/supabase/server';
+import { getToday } from '@/store/utils';
 
 // 오늘 이미 작성했는지 체크하는 함수
 async function checkTodayContent() {
@@ -12,7 +13,7 @@ async function checkTodayContent() {
         redirect('/auth/login');
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = getToday();
     const { data } = await supabase
         .from('contents')
         .select('id')
@@ -70,7 +71,7 @@ export default async function WritePage() {
 
         if (user) {
             // 한 번 더 체크 (동시 작성 방지)
-            const today = new Date().toISOString().split('T')[0];
+            const today = getToday();
             const { data: existingContent } = await supabase
                 .from('contents')
                 .select('id')

@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Content } from '../../[tab]/types';
 import createClient from '@/app/utils/supabase/client';
+import { formatJournalDetailDate } from '@/store/utils';
 
 async function getContents(date: string): Promise<Content[]> {
     const supabase = createClient();
@@ -53,14 +54,6 @@ export default function JournalPage() {
         fetchContent();
     }, [params.journal]);
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('ko-KR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
-    };
-
     if (isLoading) {
         return (
             <div className="p-6 bg-base-100 text-base-content">
@@ -83,7 +76,7 @@ export default function JournalPage() {
                 {/* 날짜 */}
                 <div className="mb-8">
                     <h1 className="text-lg text-base-content/70 font-normal">
-                        {formatDate(contents.created_at)}
+                        {formatJournalDetailDate(contents.created_at)}
                     </h1>
                 </div>
 
