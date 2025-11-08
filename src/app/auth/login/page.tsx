@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ChangeEvent, useState } from 'react';
-import createClient from '../../utils/supabase/client';
+import createClient from '@/repositories/supabase/client';
 import { useRouter } from 'next/navigation';
 import GoogleLoginButton from '@/components/GoogleLoginButton';
 

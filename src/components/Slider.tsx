@@ -2,8 +2,16 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Home, Info, User, Calendar, LogOut, Menu } from 'lucide-react';
-import createClient from '@/app/utils/supabase/client';
+import {
+    BookOpen,
+    SquarePen,
+    ChartBar,
+    SlidersHorizontal,
+    Calendar,
+    LogOut,
+    Menu,
+} from 'lucide-react';
+import createClient from '@/repositories/supabase/client';
 
 export default function Slider() {
     const router = useRouter();
@@ -65,27 +73,27 @@ export default function Slider() {
                 <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
                     {/* Sidebar content here */}
                     <li>
-                        <Link href="/dashboard/home" className="flex items-center gap-3">
-                            <Home size={20} />
-                            대시보드
+                        <Link href="/" className="flex items-center gap-3">
+                            <BookOpen size={15} />
+                            일기 목록
                         </Link>
                     </li>
                     <li>
-                        <Link href="/dashboard/info" className="flex items-center gap-3">
-                            <Info size={20} />
-                            정보
+                        <Link href="/info" className="flex items-center gap-3">
+                            <ChartBar size={15} />
+                            통계
                         </Link>
                     </li>
                     <li>
-                        <Link href="/dashboard/profile" className="flex items-center gap-3">
-                            <User size={20} />
-                            프로필
+                        <Link href="/moodCalendar" className="flex items-center gap-3">
+                            <Calendar size={15} />
+                            기분
                         </Link>
                     </li>
                     <li>
-                        <Link href="/dashboard/moodCalendar" className="flex items-center gap-3">
-                            <Calendar size={20} />
-                            기분 캘린더
+                        <Link href="/setting" className="flex items-center gap-3">
+                            <SlidersHorizontal size={15} />
+                            설정
                         </Link>
                     </li>
                 </ul>

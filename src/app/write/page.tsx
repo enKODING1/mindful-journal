@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import createClient from '../../utils/supabase/server';
+import createClient from '@/repositories/supabase/server';
 import { getToday } from '@/store/utils';
 
 // 오늘 이미 작성했는지 체크하는 함수

@@ -1,7 +1,7 @@
 // app/auth/register/page.tsx
 'use client';
 import { useState } from 'react';
-import createClient from '@/app/utils/supabase/client';
+import createClient from '@/repositories/supabase/client';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
