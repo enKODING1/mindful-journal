@@ -1,36 +1,40 @@
 'use client';
-import { ComponentProps, forwardRef } from 'react';
+import { ComponentProps } from 'react';
 
-type ButtonProps = ComponentProps<'button'> & {
+export type ButtonProps = ComponentProps<'button'> & {
     variant?: 'primary' | 'secondary' | 'ghost';
     size?: 'sm' | 'md' | 'lg';
-    loading?: boolean;
+    soft?: boolean;
+    onClick?: () => void;
 };
 
-export default forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-    {
-        children,
-        className = '',
-        variant = 'primary',
-        size = 'md',
-        loading = false,
-        disabled,
-        type = 'button',
-        ...rest
-    },
-    ref,
-) {
-    const baseClasses = `btn btn-${variant} ${size === 'sm' ? 'btn-sm' : size === 'lg' ? 'btn-lg' : ''}`;
+export default function Button({
+    variant = 'primary',
+    size = 'md',
+    soft = false,
+    className = '',
+    ...props
+}: ButtonProps) {
+    const variantClasses = {
+        primary: 'btn-primary',
+        secondary: 'btn-secondary',
+        ghost: 'btn-ghost',
+    };
+
+    const sizeClasses = {
+        sm: 'btn-sm',
+        md: 'btn-md',
+        lg: 'btn-lg',
+    };
+
+    const softClass = soft ? 'btn-soft' : '';
+
+    const classes =
+        `btn ${variantClasses[variant]} ${sizeClasses[size]} ${className} ${softClass}`.trim();
+
     return (
-        <button
-            ref={ref}
-            type={type}
-            className={`${baseClasses} ${className}`}
-            disabled={disabled || loading}
-            {...rest}
-        >
-            {loading ? <span className="loading loading-spinner loading-sm" /> : null}
-            {children}
+        <button className={classes} {...props}>
+            {props.children}
         </button>
     );
-});
+}
