@@ -4,12 +4,21 @@ import { LucideProps, LucideIcon, ShieldQuestionMark } from 'lucide-react';
 import React, { ComponentProps, ReactElement } from 'react';
 
 // 이미지 or icon, color, soft
-export type AvataProps = ComponentProps<'div'> & {
+export type AvatarProps = ComponentProps<'div'> & {
     src?: string;
     icon?: ReactElement;
     size?: 'sm' | 'md' | 'lg';
-    fallback?: string;
     rounded?: 'xl' | 'full';
+    soft?: boolean;
+    variant?:
+        | 'primary'
+        | 'secondary'
+        | 'accent'
+        | 'success'
+        | 'warning'
+        | 'error'
+        | 'info'
+        | 'neutral';
 };
 const sizeClasses = {
     sm: 'w-12 h-12',
@@ -25,22 +34,69 @@ const iconSizeMap = {
     md: 28,
     lg: 36,
 };
-
+const variantStyles = {
+    primary: {
+        bg: 'bg-primary/10',
+        icon: 'text-primary',
+        iconSoft: 'text-primary/70',
+    },
+    secondary: {
+        bg: 'bg-secondary/10',
+        icon: 'text-secondary',
+        iconSoft: 'text-secondary/70',
+    },
+    accent: {
+        bg: 'bg-accent/10',
+        icon: 'text-accent',
+        iconSoft: 'text-accent/70',
+    },
+    success: {
+        bg: 'bg-success/10',
+        icon: 'text-success',
+        iconSoft: 'text-success/70',
+    },
+    warning: {
+        bg: 'bg-warning/10',
+        icon: 'text-warning',
+        iconSoft: 'text-warning/70',
+    },
+    error: {
+        bg: 'bg-error/10',
+        icon: 'text-error',
+        iconSoft: 'text-error/70',
+    },
+    info: {
+        bg: 'bg-info/10',
+        icon: 'text-info',
+        iconSoft: 'text-info/70',
+    },
+    neutral: {
+        bg: 'bg-base-200',
+        icon: 'text-base-content',
+        iconSoft: 'text-base-content/60',
+    },
+};
 export default function Avatar({
     src,
     icon,
     size = 'md',
     rounded = 'full',
-    fallback = '?',
+    soft = true,
     className = '',
+    variant = 'neutral',
     ...props
-}: AvataProps) {
+}: AvatarProps) {
+    const variantStyle = variantStyles[variant];
+    const iconColorClass = soft ? 'text-base-content/60' : 'text-base-content';
+    const bgClass = variantStyle.bg;
+
     const renderIcon = () => {
         if (!icon) return null;
 
         if (React.isValidElement(icon)) {
-            return React.cloneElement(icon as ReactElement<{ size?: number }>, {
+            return React.cloneElement(icon as ReactElement<{ size?: number; className?: string }>, {
                 size: iconSizeMap[size],
+                className: variantStyle.iconSoft,
             });
         }
         return icon;
@@ -54,15 +110,15 @@ export default function Avatar({
         />
     ) : icon ? (
         <div
-            className={`flex items-center justify-center ${roundedClasses[rounded]} ${sizeClasses[size]} bg-base-200`}
+            className={`flex items-center justify-center ${roundedClasses[rounded]} ${sizeClasses[size]} ${bgClass}`}
         >
             {renderIcon()}
         </div>
     ) : (
         <div
-            className={`flex items-center justify-center ${roundedClasses[rounded]} ${sizeClasses[size]} bg-base-200`}
+            className={`flex items-center justify-center ${roundedClasses[rounded]} ${sizeClasses[size]} ${bgClass}`}
         >
-            <ShieldQuestionMark size={iconSizeMap[size]} />
+            <ShieldQuestionMark size={iconSizeMap[size]} className={variantStyle.iconSoft} />
         </div>
     );
     return (
