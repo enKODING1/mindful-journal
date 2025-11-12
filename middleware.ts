@@ -1,4 +1,4 @@
-import createClient from '@/app/utils/supabase/server';
+import createClient from '@/repositories/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(req: NextRequest) {

@@ -26,30 +26,35 @@ const borderStyleClasses = {
 };
 
 const sizeClasses = {
-    xs: 'card-xs',
-    sm: 'card-sm',
-    md: 'card-md',
-    lg: 'card-lg',
-    xl: 'card-xl',
+    xs: 'max-w-xs',
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
 };
 
 export default function Card({
     variant,
     borderStyle,
-    size = 'md',
+    size,
     side = false,
     imageFull = false,
     className = '',
+    children,
     ...props
 }: CardProps) {
     const variantClass = variant ? variantClasses[variant] : '';
     const borderStyleClass = borderStyle ? borderStyleClasses[borderStyle] : '';
-    const sizeClass = sizeClasses[size];
+    const sizeClass = size ? sizeClasses[size] : '';
     const sideClass = side ? 'card-side' : '';
     const imageFullClass = imageFull ? 'image-full' : '';
 
     const classes =
-        `card ${variantClass} ${borderStyleClass} ${sizeClass} ${sideClass} ${imageFullClass} ${className}`.trim();
+        `card w-full ${variantClass} ${borderStyleClass} ${sizeClass} ${sideClass} ${imageFullClass} ${className}`.trim();
 
-    return <div className={classes} {...props} />;
+    return (
+        <div className={classes} {...props}>
+            {children}
+        </div>
+    );
 }

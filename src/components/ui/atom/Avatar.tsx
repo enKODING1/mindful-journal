@@ -1,6 +1,6 @@
 'use client';
 
-import { LucideProps, LucideIcon, ShieldQuestionMark } from 'lucide-react';
+import { ShieldQuestionMark } from 'lucide-react';
 import React, { ComponentProps, ReactElement } from 'react';
 
 // 이미지 or icon, color, soft
@@ -87,7 +87,6 @@ export default function Avatar({
     ...props
 }: AvatarProps) {
     const variantStyle = variantStyles[variant];
-    const iconColorClass = soft ? 'text-base-content/60' : 'text-base-content';
     const bgClass = variantStyle.bg;
 
     const renderIcon = () => {

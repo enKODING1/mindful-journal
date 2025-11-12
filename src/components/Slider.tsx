@@ -2,15 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-    BookOpen,
-    SquarePen,
-    ChartBar,
-    SlidersHorizontal,
-    Calendar,
-    LogOut,
-    Menu,
-} from 'lucide-react';
+import { BookOpen, ChartBar, SlidersHorizontal, Calendar, LogOut, Menu } from 'lucide-react';
 import createClient from '@/repositories/supabase/client';
 
 export default function Slider() {

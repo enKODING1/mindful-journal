@@ -1,4 +1,4 @@
-import { Content, SimplifiedContent, SimplifiedContentsByMood } from '@/store/models';
+import { Content, SimplifiedContentsByMood } from '@/store/models';
 import { Mood } from '../models/Mood';
 
 // 일기를 기분별로 그룹화
