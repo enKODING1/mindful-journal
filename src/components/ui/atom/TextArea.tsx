@@ -39,9 +39,10 @@ export default function TextArea({
     inputSize = 'md',
     activate = true,
     placeholder,
+    className,
     ...props
 }: TextAreaProps) {
-    const classes = `textarea ${variantClasses[variant]} ${inputSizeClasses[inputSize]}`;
+    const classes = `textarea ${variantClasses[variant]} ${inputSizeClasses[inputSize]} ${className}`;
     const isDisabled = !activate;
     return (
         <textarea

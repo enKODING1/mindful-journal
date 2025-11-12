@@ -40,9 +40,10 @@ export default function Input({
     inputSize = 'md',
     activate = true,
     placeholder,
+    className,
     ...props
 }: InputProps) {
-    const classes = `input ${variantClasses[variant]} ${inputSizeClasses[inputSize]}`;
+    const classes = `input ${variantClasses[variant]} ${inputSizeClasses[inputSize]} ${className}`;
     const isDisabled = !activate;
     return (
         <input
