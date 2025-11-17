@@ -30,7 +30,7 @@ export default function Button({
     const softClass = soft ? 'btn-soft' : '';
 
     const classes =
-        `btn ${variantClasses[variant]} ${sizeClasses[size]} ${className} ${softClass}`.trim();
+        `btn rounded-3xl ${variantClasses[variant]} ${sizeClasses[size]} ${className} ${softClass}`.trim();
 
     return (
         <button className={classes} {...props}>
