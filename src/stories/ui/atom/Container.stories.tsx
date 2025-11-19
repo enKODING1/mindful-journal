@@ -99,4 +99,3 @@ export const DifferentVariants: Story = {
         </div>
     ),
 };
-
