@@ -1,6 +1,7 @@
 import type { FeatureCardProps } from '../molecules/FeatureCard';
 import FeatureCard from '../molecules/FeatureCard';
 import Avatar from '../atom/Avatar';
+import Container from '../atom/Container';
 import { CalendarClock, PenLine, ChartNoAxesColumn, BookOpen } from 'lucide-react';
 
 const featureCards: FeatureCardProps[] = [
@@ -29,7 +30,7 @@ const featureCards: FeatureCardProps[] = [
 
 export default function JournalEmptyState() {
     return (
-        <div className="bg-base-300 p-8 flex flex-col gap-4">
+        <Container variant="base-300" padding="xl" gap="md" rounded="2xl" centered={false}>
             <div className="flex flex-col w-full items-center gap-3">
                 <Avatar size="lg" icon={<BookOpen />} />
                 <div className="flex flex-col items-center">
@@ -45,6 +46,6 @@ export default function JournalEmptyState() {
                     <FeatureCard key={card.title} {...card} />
                 ))}
             </div>
-        </div>
+        </Container>
     );
 }
