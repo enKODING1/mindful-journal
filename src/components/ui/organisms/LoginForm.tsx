@@ -57,8 +57,8 @@ export default function LoginForm({
     return (
         <div className="flex flex-col gap-4 w-full">
             <div className="flex flex-col gap-2 mb-2">
-                <h2 className="text-2xl font-bold">로그인</h2>
-                <p className="text-sm text-neutral-content/70">계정에 로그인하세요</p>
+                <h2 className="text-2xl font-bold">마음챙김 일기</h2>
+                <p className="text-sm text-neutral-content/70">오신것을 환영합니다</p>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">

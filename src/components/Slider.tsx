@@ -22,7 +22,7 @@ export default function Slider() {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        router.push('/auth/login');
+        router.push('/login');
     };
 
     return (
