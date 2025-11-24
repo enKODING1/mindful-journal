@@ -1,12 +1,14 @@
 'use client';
+
 import { useState } from 'react';
 import Container from '../atom/Container';
 import TextArea from '../atom/TextArea';
 import Button from '../atom/Button';
 import MoodTab from '../molecules/MoodTab';
+import { Mood } from '@/domain/models/Mood';
 
 export interface JournalFormProps {
-    onSubmit?: (content: string) => void;
+    onSubmit?: (content: string, mood: Mood) => void;
     placeholder?: string;
     submitButtonText?: string;
     variant?: 'base-100' | 'base-200' | 'base-300' | 'primary' | 'secondary' | 'accent' | 'neutral';
@@ -19,11 +21,13 @@ export default function JournalForm({
     variant = 'base-300',
 }: JournalFormProps) {
     const [content, setContent] = useState('');
+    const [mood, setMood] = useState<Mood>('happy');
 
     const handleSubmit = () => {
         if (content.trim() && onSubmit) {
-            onSubmit(content);
+            onSubmit(content, mood);
             setContent('');
+            setMood('happy');
         }
     };
 
@@ -39,7 +43,7 @@ export default function JournalForm({
             />
             <div className="flex flex-col">
                 <p>오늘의 기분은 어떠셨나요?</p>
-                <MoodTab />
+                <MoodTab defaultValue={mood} onChange={(value) => setMood(value)} />
             </div>
             <div className="flex w-full">
                 <Button
