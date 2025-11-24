@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Container from '../atom/Container';
 import TextArea from '../atom/TextArea';
 import Button from '../atom/Button';
+import MoodTab from '../molecules/MoodTab';
 
 export interface JournalFormProps {
     onSubmit?: (content: string) => void;
@@ -27,7 +28,7 @@ export default function JournalForm({
     };
 
     return (
-        <Container variant={variant} padding="xl" gap="md" rounded="2xl" centered={false}>
+        <Container variant={variant} padding="md" gap="md" rounded="2xl" centered={false}>
             <TextArea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -36,12 +37,17 @@ export default function JournalForm({
                 variant="neutral"
                 inputSize="lg"
             />
-            <div className="flex justify-end">
+            <div className="flex flex-col">
+                <p>오늘의 기분은 어떠셨나요?</p>
+                <MoodTab />
+            </div>
+            <div className="flex w-full">
                 <Button
                     variant="primary"
                     size="md"
                     onClick={handleSubmit}
                     disabled={!content.trim()}
+                    className="w-full"
                 >
                     {submitButtonText}
                 </Button>
