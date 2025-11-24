@@ -1,6 +1,6 @@
 import * as JournalRepo from '@/repositories/journalRepository';
-import * as DomainUtil from '@/store/utils/';
-import { Content } from '@/store/models';
+import * as DomainUtil from '@/domain/utils/';
+import { Content } from '@/domain/models';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export async function listJournalsByUser(supabase: SupabaseClient): Promise<Content[]> {

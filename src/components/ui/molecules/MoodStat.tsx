@@ -1,4 +1,4 @@
-import { getMoodEmoji, getMoodLabel, Mood } from '@/store/models';
+import { getMoodEmoji, getMoodLabel, Mood } from '@/domain/models';
 import ProgressBar from '../atom/ProgressBar';
 
 export type MoodStatProps = {

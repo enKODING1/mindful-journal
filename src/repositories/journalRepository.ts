@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Mood, Content } from '@/store/models';
+import { Mood, Content } from '@/domain/models';
 
 // 사용자별 전체 목록
 export async function listJournalsByUser(supabase: SupabaseClient): Promise<Content[]> {

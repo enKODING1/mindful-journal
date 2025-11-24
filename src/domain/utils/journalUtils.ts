@@ -1,4 +1,4 @@
-import { Content } from '@/store/models';
+import { Content } from '@/domain/models';
 import { getToday } from '@/lib/utils';
 
 // 현재 시간을 기준으로 오늘인지 확인

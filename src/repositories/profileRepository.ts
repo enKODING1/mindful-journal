@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Profile } from '@/store/models';
-import { UnauthorizedError, NotFoundError } from '@/store/errors';
+import { Profile } from '@/domain/models';
+import { UnauthorizedError, NotFoundError } from '@/domain/errors';
 
 // 현재 로그인 사용자의 프로필 가져오기
 export async function getMyProfile(supabase: SupabaseClient): Promise<Profile> {

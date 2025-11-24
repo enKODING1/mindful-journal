@@ -1,11 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 // import { Content } from './types';
-import { Content } from '@/store/models';
+import { Content } from '@/domain/models';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import createClient from '@/repositories/supabase/client';
-import { groupContentsByMood } from '@/store/utils/contentUtils';
+import { groupContentsByMood } from '@/domain/utils/contentUtils';
 
 export default function MoodCalendar() {
     const [selected, setSelected] = useState<Date>();

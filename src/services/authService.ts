@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import * as AuthRepo from '@/repositories/authRepository';
-import { ValidationError } from '@/store/errors';
+import { ValidationError } from '@/domain/errors';
 
 export async function signUp(
     supabase: SupabaseClient,
