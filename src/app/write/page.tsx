@@ -4,6 +4,7 @@ import { useState } from 'react';
 import JournalForm from '@/components/ui/organisms/JournalForm';
 import Container from '@/components/ui/atom/Container';
 import Alert from '@/components/ui/atom/Alert';
+import JournalCalendar from '@/components/ui/organisms/JournalCalendar';
 import { useJournals } from '@/hooks';
 import { Mood } from '@/domain/models';
 
@@ -40,6 +41,11 @@ export default function Write() {
                 onSubmit={handleSubmit}
                 submitButtonText={loading ? '저장 중...' : '저장'}
             />
+
+            <div className="mt-8">
+                <h3 className="text-xl font-bold mb-4">일기 작성 캘린더</h3>
+                <JournalCalendar />
+            </div>
         </Container>
     );
 }

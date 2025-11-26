@@ -1,18 +1,24 @@
 'use client';
 
-import { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/style.css';
 
-export default function Calendar() {
-    const [date, setDate] = useState<Date | undefined>();
+export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+
+export default function Calendar({
+    className,
+    classNames,
+    showOutsideDays = true,
+    ...props
+}: CalendarProps) {
     return (
-        <>
-            <DayPicker
-                className="react-day-picker"
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-            />
-        </>
+        <DayPicker
+            showOutsideDays={showOutsideDays}
+            className={className}
+            classNames={{
+                ...classNames,
+            }}
+            {...props}
+        />
     );
 }
