@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Calendar from '../atom/Calendar';
 import { useJournals } from '@/hooks';
 import { ko } from 'date-fns/locale';
+import { Mood } from '@/domain/models';
 
 export default function JournalCalendar() {
     const { journals, fetchJournals } = useJournals();
@@ -14,35 +15,74 @@ export default function JournalCalendar() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 일기가 작성된 날짜들을 Set으로 변환 (빠른 검색을 위해)
-    const journalDateStrings = new Set(
-        journals.map((journal) => {
-            const date = new Date(journal.created_at);
-            return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-        }),
-    );
-
-    // 특정 날짜에 일기가 있는지 확인
-    const hasJournal = (date: Date) => {
+    // 날짜별 무드 매핑 (날짜 문자열 -> 무드)
+    const moodByDate = new Map<string, Mood>();
+    journals.forEach((journal) => {
+        const date = new Date(journal.created_at);
         const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-        return journalDateStrings.has(dateString);
+        // 같은 날짜에 여러 일기가 있을 경우 최신 일기의 무드 사용
+        if (!moodByDate.has(dateString)) {
+            moodByDate.set(dateString, journal.mood);
+        }
+    });
+
+    // 특정 날짜가 특정 무드인지 확인
+    const hasMood = (mood: Mood) => (date: Date) => {
+        const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        return moodByDate.get(dateString) === mood;
+    };
+
+    const moodColors: Record<Mood, string> = {
+        happy: 'bg-yellow-400',
+        sad: 'bg-blue-400',
+        angry: 'bg-red-400',
+        tired: 'bg-gray-400',
+        relaxed: 'bg-green-400',
     };
 
     return (
-        <div className="flex justify-center p-4 bg-base-200 rounded-2xl">
+        <div className="flex flex-col items-center p-4 bg-base-200 rounded-2xl">
             <Calendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
                 locale={ko}
                 modifiers={{
-                    hasJournal: (date) => hasJournal(date),
+                    happy: hasMood('happy'),
+                    sad: hasMood('sad'),
+                    angry: hasMood('angry'),
+                    tired: hasMood('tired'),
+                    relaxed: hasMood('relaxed'),
                 }}
                 modifiersClassNames={{
-                    hasJournal:
-                        'relative after:content-[""] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:bg-primary after:rounded-full',
+                    happy: 'relative after:content-[""] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:bg-yellow-400 after:rounded-full',
+                    sad: 'relative after:content-[""] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:bg-blue-400 after:rounded-full',
+                    angry: 'relative after:content-[""] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:bg-red-400 after:rounded-full',
+                    tired: 'relative after:content-[""] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:bg-gray-400 after:rounded-full',
+                    relaxed:
+                        'relative after:content-[""] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:bg-green-400 after:rounded-full',
                 }}
             />
+            <div className="mt-4 flex flex-wrap gap-3 justify-center">
+                {Object.entries(moodColors).map(([mood, color]) => {
+                    const label =
+                        mood === 'happy'
+                            ? '기쁨'
+                            : mood === 'sad'
+                              ? '슬픔'
+                              : mood === 'angry'
+                                ? '화남'
+                                : mood === 'tired'
+                                  ? '피곤'
+                                  : '편안';
+                    return (
+                        <div key={mood} className="flex items-center gap-1.5">
+                            <div className={`w-2.5 h-2.5 rounded-full ${color}`} />
+                            <span className="text-xs text-gray-500">{label}</span>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }
