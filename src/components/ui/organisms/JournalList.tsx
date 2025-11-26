@@ -56,7 +56,11 @@ const groupJournalsByMonth = (journals: Content[]): GroupedJournals[] => {
                 (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
             ),
         }))
-        .sort((a, b) => b.yearMonth.localeCompare(a.yearMonth));
+        .sort((a, b) => {
+            const dateA = new Date(a.journals[0].created_at).getTime();
+            const dateB = new Date(b.journals[0].created_at).getTime();
+            return dateB - dateA;
+        });
 };
 
 export default function JournalList({ journals, onJournalClick }: JournalListProps) {
