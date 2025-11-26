@@ -4,8 +4,11 @@ export function getToday(): string {
 }
 
 // 날짜를 YYYY-MM-DD 형식으로 변환
-export function formatJournalDate(dateString: string): string {
-    return new Date(dateString).toISOString().split('T')[0];
+export function formatJournalDate(dateString: string | Date): string {
+    if (typeof dateString === 'string') {
+        return new Date(dateString).toISOString().split('T')[0];
+    }
+    return dateString.toISOString().split('T')[0];
 }
 
 // 일기 카드에 표시할 날짜 형식

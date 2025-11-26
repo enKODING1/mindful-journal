@@ -6,9 +6,18 @@ import { useJournals } from '@/hooks';
 import { ko } from 'date-fns/locale';
 import { Mood } from '@/domain/models';
 
-export default function JournalCalendar() {
+interface JournalCalendarProps {
+    onSelectDate?: (date: Date | undefined) => void;
+}
+
+export default function JournalCalendar({ onSelectDate }: JournalCalendarProps) {
     const { journals, fetchJournals } = useJournals();
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+
+    const handleSelectDate = (date: Date | undefined) => {
+        setSelectedDate(date);
+        onSelectDate?.(date);
+    };
 
     useEffect(() => {
         fetchJournals();
@@ -45,7 +54,7 @@ export default function JournalCalendar() {
             <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={setSelectedDate}
+                onSelect={handleSelectDate}
                 locale={ko}
                 modifiers={{
                     happy: hasMood('happy'),
