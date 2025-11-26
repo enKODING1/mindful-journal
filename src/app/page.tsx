@@ -6,6 +6,7 @@ import JournalList from '@/components/ui/organisms/JournalList';
 import Container from '@/components/ui/atom/Container';
 import { useJournals } from '@/hooks';
 import type { Content } from '@/domain/models';
+import Loading from '@/components/ui/atom/Loading';
 
 export default function Home() {
     const { journals, loading, error, fetchJournals } = useJournals();
@@ -27,7 +28,8 @@ export default function Home() {
             </div>
 
             {loading && (
-                <div className="text-center py-12">
+                <div className="flex flex-col items-center justify-center text-center py-12">
+                    <Loading />
                     <p className="text-base-content/70">일기를 불러오는 중...</p>
                 </div>
             )}

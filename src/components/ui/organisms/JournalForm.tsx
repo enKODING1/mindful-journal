@@ -18,7 +18,7 @@ export default function JournalForm({
     onSubmit,
     placeholder = '오늘의 일기를 작성해보세요...',
     submitButtonText = '저장',
-    variant = 'base-300',
+    variant = 'base-100',
 }: JournalFormProps) {
     const [content, setContent] = useState('');
     const [mood, setMood] = useState<Mood>('happy');
@@ -37,7 +37,7 @@ export default function JournalForm({
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder={placeholder}
-                className="w-full min-h-[200px] resize-none"
+                className="w-full min-h-[200px] resize-none bg-base-300"
                 variant="neutral"
                 inputSize="lg"
             />

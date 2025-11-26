@@ -20,7 +20,7 @@ export default function Write() {
     };
 
     return (
-        <Container className="mt-10" variant="base-300" padding="xl" gap="md" rounded="2xl">
+        <Container className="mt-10" variant="base-100" padding="xl" gap="md" rounded="2xl">
             <h2 className="text-2xl font-bold">오늘의 일기</h2>
             <p>하루중 기억하고 싶은 순간은 무엇인가요?</p>
 
