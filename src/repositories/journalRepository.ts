@@ -31,6 +31,30 @@ export async function getJournalByDate(supabase: SupabaseClient, ymd: string): P
     return data ?? [];
 }
 
+// 특정 ID의 일기 가져오기
+export async function getJournalById(
+    supabase: SupabaseClient,
+    id: number,
+): Promise<Content | null> {
+    const { data, error } = await supabase
+        .from('contents')
+        .select(
+            `
+    *,
+    comments(
+      id,
+      comment_body,
+      created_at
+    )
+  `,
+        )
+        .eq('id', id)
+        .single();
+
+    if (error) throw error;
+    return data;
+}
+
 // 오늘 작성했는지 여부
 export async function hasWrittenToday(
     supabase: SupabaseClient,

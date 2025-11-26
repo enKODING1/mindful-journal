@@ -11,6 +11,13 @@ export async function getJournalByDate(supabase: SupabaseClient, ymd: string): P
     return JournalRepo.getJournalByDate(supabase, ymd);
 }
 
+export async function getJournalById(
+    supabase: SupabaseClient,
+    id: number,
+): Promise<Content | null> {
+    return JournalRepo.getJournalById(supabase, id);
+}
+
 export async function createJournal(
     supabase: SupabaseClient,
     input: { content: string; mood: Mood },
