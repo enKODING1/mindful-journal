@@ -4,7 +4,7 @@ import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import JournalDetailView from '@/components/ui/organisms/JournalDetailView';
 import Container from '@/components/ui/atom/Container';
-import createClient from '@/repositories/supabase/client';
+import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
 import type { Content } from '@/domain/models';
 

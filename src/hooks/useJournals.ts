@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import createClient from '@/repositories/supabase/client';
+import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
 import { Content, Mood } from '@/domain/models';
 

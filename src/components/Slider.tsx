@@ -11,7 +11,7 @@ import {
     Menu,
     SquarePen,
 } from 'lucide-react';
-import createClient from '@/repositories/supabase/client';
+import createClient from '@/db/supabase/client';
 
 export default function Slider() {
     const router = useRouter();

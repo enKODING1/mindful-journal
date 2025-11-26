@@ -1,4 +1,4 @@
-import * as JournalRepo from '@/repositories/journalRepository';
+import * as JournalRepo from '@/db/journal';
 import * as DomainUtil from '@/domain/utils/';
 import { Content, Mood } from '@/domain/models';
 import { SupabaseClient } from '@supabase/supabase-js';

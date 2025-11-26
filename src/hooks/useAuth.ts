@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import createClient from '@/repositories/supabase/client';
+import createClient from '@/db/supabase/client';
 import * as authService from '@/services/authService';
 
 export function useAuth() {
