@@ -2,7 +2,15 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, ChartBar, SlidersHorizontal, Calendar, LogOut, Menu } from 'lucide-react';
+import {
+    BookOpen,
+    ChartBar,
+    SlidersHorizontal,
+    Calendar,
+    LogOut,
+    Menu,
+    SquarePen,
+} from 'lucide-react';
 import createClient from '@/repositories/supabase/client';
 
 export default function Slider() {
@@ -64,6 +72,12 @@ export default function Slider() {
                 ></label>
                 <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
                     {/* Sidebar content here */}
+                    <li>
+                        <Link href="/write" className="flex items-center gap-3">
+                            <SquarePen size={15} />
+                            일기 작성
+                        </Link>
+                    </li>
                     <li>
                         <Link href="/" className="flex items-center gap-3">
                             <BookOpen size={15} />
