@@ -1,78 +1,56 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PeriodTab from '@/components/ui/molecules/PeriodTab';
 import Container from '@/components/ui/atom/Container';
 import JournalStats, { JournalStatsData } from '@/components/ui/organisms/JournalStats';
 import MoodDistribution from '@/components/ui/organisms/MoodDistribution';
-import { MoodStat } from '@/domain/models';
-import MonthlyTrend, { MonthlyData } from '@/components/ui/organisms/MonthlyTrend';
+import MonthlyTrend from '@/components/ui/organisms/MonthlyTrend';
 import { useJournals } from '@/hooks';
 import {
     calculateCurrentStreak,
     calculateLongestStreak,
     calculateAvgWordCount,
+    filterByPeriod,
+    calculateMoodDistribution,
+    calculateMonthlyTrend,
 } from '@/domain/utils';
 
 export default function StatPage() {
-    const { journals, totalCount, fetchJournals, countJournalsByUser } = useJournals();
+    const { journals, fetchJournals } = useJournals();
+    const [period, setPeriod] = useState<'week' | 'month' | 'year'>('week');
 
     useEffect(() => {
         fetchJournals();
-        countJournalsByUser();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 통계 계산
+    // 기간별 필터링
+    const filteredJournals = useMemo(() => filterByPeriod(journals, period), [journals, period]);
+
+    // 통계 계산 (필터링된 데이터로)
     const stats: JournalStatsData = useMemo(
         () => ({
-            totalCount,
-            currentStreak: calculateCurrentStreak(journals),
-            longestStreak: calculateLongestStreak(journals),
-            avgWordCount: calculateAvgWordCount(journals),
+            totalCount: filteredJournals.length,
+            currentStreak: calculateCurrentStreak(filteredJournals),
+            longestStreak: calculateLongestStreak(filteredJournals),
+            avgWordCount: calculateAvgWordCount(filteredJournals),
         }),
-        [journals, totalCount],
+        [filteredJournals],
     );
 
-    const moodStats: MoodStat[] = [
-        {
-            mood: 'happy',
-            count: 10,
-            percentage: 100,
-        },
-        {
-            mood: 'sad',
-            count: 0,
-            percentage: 0,
-        },
-        {
-            mood: 'angry',
-            count: 0,
-            percentage: 0,
-        },
-        {
-            mood: 'tired',
-            count: 0,
-            percentage: 0,
-        },
-        {
-            mood: 'relaxed',
-            count: 0,
-            percentage: 0,
-        },
-    ];
+    // 감정 분포 계산 (필터링된 데이터로)
+    const moodStats = useMemo(
+        () => calculateMoodDistribution(filteredJournals),
+        [filteredJournals],
+    );
 
-    const monthlyData: MonthlyData[] = [
-        {
-            month: '2025-11',
-            count: 44,
-            percentage: 49,
-        },
-    ];
+    // 월별 추이 계산 (필터링된 데이터로)
+    const monthlyData = useMemo(() => calculateMonthlyTrend(filteredJournals), [filteredJournals]);
 
     return (
         <Container padding="xl" className="flex flex-col gap-4">
-            <PeriodTab />
+            <PeriodTab value={period} onChange={setPeriod} />
             <JournalStats stats={stats} />
             <MoodDistribution stats={moodStats} />
             <MonthlyTrend data={monthlyData} />

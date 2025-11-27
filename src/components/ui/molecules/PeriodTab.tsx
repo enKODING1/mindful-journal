@@ -5,6 +5,7 @@ import TabGroup from './TabGroup';
 type Period = 'week' | 'month' | 'year';
 
 export type PeriodTabProps = {
+    value?: Period;
     defaultValue?: Period;
     onChange?: (value: Period) => void;
 };
@@ -15,10 +16,11 @@ const periodTabs: { label: string; value: Period }[] = [
     { label: '올해', value: 'year' },
 ];
 
-export default function PeriodTab({ defaultValue = 'week', onChange }: PeriodTabProps) {
+export default function PeriodTab({ value, defaultValue = 'week', onChange }: PeriodTabProps) {
     return (
         <TabGroup
             items={periodTabs}
+            value={value}
             defaultValue={defaultValue}
             onChange={(value) => onChange?.(value as Period)}
         />

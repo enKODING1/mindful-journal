@@ -11,23 +11,41 @@ export type TabItem = {
 
 export type TabGroupProps = {
     items: TabItem[];
+    value?: string; // Controlled value
     defaultValue?: string;
     onChange?: (value: string) => void;
 };
 
-export default function TabGroup({ items, defaultValue, onChange }: TabGroupProps) {
-    const [selectedValue, setSelectedValue] = useState<string>(defaultValue || items[0]?.value);
+export default function TabGroup({ items, value, defaultValue, onChange }: TabGroupProps) {
+    const [selectedValue, setSelectedValue] = useState<string>(
+        value || defaultValue || items[0]?.value,
+    );
 
+    // Update internal state when external value changes (controlled)
     useEffect(() => {
-        if (defaultValue) {
+        if (value !== undefined) {
+            setSelectedValue(value);
+        }
+    }, [value]);
+
+    // Update internal state when defaultValue changes (uncontrolled)
+    useEffect(() => {
+        if (value === undefined && defaultValue) {
             setSelectedValue(defaultValue);
         }
-    }, [defaultValue]);
+    }, [defaultValue, value]);
 
-    const handleSelect = (value: string) => {
-        if (value === selectedValue) return;
-        setSelectedValue(value);
-        onChange?.(value);
+    const handleSelect = (newValue: string) => {
+        if (newValue === selectedValue) return;
+
+        // If controlled, only call onChange
+        if (value !== undefined) {
+            onChange?.(newValue);
+        } else {
+            // If uncontrolled, update internal state and call onChange
+            setSelectedValue(newValue);
+            onChange?.(newValue);
+        }
     };
 
     return (

@@ -1,5 +1,7 @@
-import { Content } from '@/domain/models';
+import { Content, MoodStat, Mood } from '@/domain/models';
 import { getToday } from '@/lib/utils';
+
+export type Period = 'week' | 'month' | 'year' | 'all';
 
 // 현재 시간을 기준으로 오늘인지 확인
 export function isToday(dateString: string): boolean {
@@ -92,4 +94,86 @@ export function calculateAvgWordCount(contents: Content[]): number {
 
     const totalChars = contents.reduce((sum, content) => sum + content.content.length, 0);
     return Math.round(totalChars / contents.length);
+}
+
+// 기간별 필터링
+export function filterByPeriod(contents: Content[], period: Period): Content[] {
+    if (period === 'all') return contents;
+
+    const now = new Date();
+    let startDate: Date;
+
+    switch (period) {
+        case 'week':
+            startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            break;
+        case 'month':
+            startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 1);
+            break;
+        case 'year':
+            startDate = new Date();
+            startDate.setFullYear(startDate.getFullYear() - 1);
+            break;
+        default:
+            return contents;
+    }
+
+    return contents.filter((c) => new Date(c.created_at) >= startDate);
+}
+
+// 감정분포 별 비율 계산
+export function calculateMoodDistribution(contents: Content[]): MoodStat[] {
+    const moodCount = contents.reduce(
+        (acc, content) => {
+            const mood = content.mood;
+            if (mood) {
+                acc[mood] = (acc[mood] || 0) + 1;
+            }
+            return acc;
+        },
+        {} as Record<string, number>,
+    );
+
+    const total = Object.values(moodCount).reduce((sum, count) => sum + count, 0);
+    const moodStats: MoodStat[] = Object.entries(moodCount).map(([mood, count]) => ({
+        mood: mood as Mood, // Type assertion
+        count,
+        percentage: Math.round((count / total) * 100),
+    }));
+
+    return moodStats;
+}
+
+// 월별 추이 계산
+export function calculateMonthlyTrend(contents: Content[]): Array<{
+    month: string;
+    count: number;
+    percentage: number;
+}> {
+    if (contents.length === 0) return [];
+
+    // 월별로 그룹화 (YYYY-MM 형식)
+    const monthlyCount = contents.reduce(
+        (acc, content) => {
+            const month = content.created_at.substring(0, 7); // "2025-11"
+            acc[month] = (acc[month] || 0) + 1;
+            return acc;
+        },
+        {} as Record<string, number>,
+    );
+
+    // 최댓값 찾기 (퍼센티지 계산용)
+    const maxCount = Math.max(...Object.values(monthlyCount));
+
+    // 월별 데이터 생성 (최신순 정렬)
+    const monthlyData = Object.entries(monthlyCount)
+        .map(([month, count]) => ({
+            month,
+            count,
+            percentage: Math.round((count / maxCount) * 100),
+        }))
+        .sort((a, b) => b.month.localeCompare(a.month));
+
+    return monthlyData;
 }
