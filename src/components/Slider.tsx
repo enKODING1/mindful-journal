@@ -85,7 +85,7 @@ export default function Slider() {
                         </Link>
                     </li>
                     <li>
-                        <Link href="/info" className="flex items-center gap-3">
+                        <Link href="/stat" className="flex items-center gap-3">
                             <ChartBar size={15} />
                             통계
                         </Link>

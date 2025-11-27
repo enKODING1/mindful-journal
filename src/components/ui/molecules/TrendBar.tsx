@@ -1,17 +1,20 @@
-import ProgressBar from '../atom/ProgressBar';
+import ProgressBar, { ProgressBarProps } from '../atom/ProgressBar';
 
 export type TrendBarProps = {
-    date: string;
+    label: string;
     count: number;
     value: number;
+    variant?: ProgressBarProps['variant'];
 };
 
-export default function TrendBar({ date, count, value }: TrendBarProps) {
+export default function TrendBar({ label, count, value, variant = 'success' }: TrendBarProps) {
     return (
-        <div className="flex flex-row justify-between w-80 items-center">
-            <span className="w-40 p-1">{date}</span>
-            <ProgressBar variant="primary" value={value} />
-            <span className="w-40 p-1">{count}개</span>
+        <div className="flex items-center gap-4 w-full">
+            <span className="text-base font-medium w-16 flex-shrink-0">{label}</span>
+            <ProgressBar variant={variant} value={value} className="flex-1" />
+            <span className="text-sm text-base-content/70 w-16 text-right flex-shrink-0">
+                {count}개
+            </span>
         </div>
     );
 }

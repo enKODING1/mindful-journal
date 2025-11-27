@@ -45,3 +45,7 @@ export async function createJournal(
 export function hasWrittenToday(contents: Content[]): boolean {
     return DomainUtil.hasWrittenToday(contents);
 }
+
+export async function countJournalsByUser(supabase: SupabaseClient): Promise<number> {
+    return JournalRepo.countJournalsByUser(supabase);
+}

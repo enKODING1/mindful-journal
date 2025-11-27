@@ -102,3 +102,14 @@ export async function addComment(
 
     if (error) throw error;
 }
+
+// 사용자별 일기 전체 개수
+export async function countJournalsByUser(supabase: SupabaseClient): Promise<number> {
+    const { count, error } = await supabase
+        .from('contents')
+        .select('id', { count: 'exact', head: true });
+
+    if (error) throw error;
+
+    return count ?? 0;
+}

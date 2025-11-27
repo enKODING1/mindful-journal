@@ -11,6 +11,7 @@ export function useJournals() {
     const [journals, setJournals] = useState<Content[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [totalCount, setTotalCount] = useState(0);
     const router = useRouter();
     // supabase 클라이언트 메모이제이션
     const supabase = useMemo(() => createClient(), []);
@@ -71,12 +72,29 @@ export function useJournals() {
         [supabase],
     );
 
+    // 사용자별 일기 전체 개수
+    const countJournalsByUser = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await journalService.countJournalsByUser(supabase);
+            setTotalCount(data);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : '일기를 불러오는데 실패했습니다';
+            setError(message);
+        } finally {
+            setLoading(false);
+        }
+    }, [supabase]);
+
     return {
         journals,
         loading,
         error,
+        totalCount,
         fetchJournals,
         createJournal,
         fetchJournalsByDate,
+        countJournalsByUser,
     };
 }

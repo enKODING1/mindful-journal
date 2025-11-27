@@ -2,16 +2,25 @@
 import type { CardProps } from '@/components/ui/atom/Card';
 import Card from '@/components/ui/atom/Card';
 
-export type FeatureCardProps = Omit<CardProps, 'children'> & {
-    title?: string;
+export type FeatureCardProps = Omit<CardProps, 'children' | 'title'> & {
+    title?: React.ReactNode;
     text?: string;
-    color?: 'primary' | 'secondary' | 'accent' | 'neutral' | 'success' | 'error' | 'warning';
+    color?:
+        | 'primary'
+        | 'secondary'
+        | 'accent'
+        | 'info'
+        | 'neutral'
+        | 'success'
+        | 'error'
+        | 'warning';
 };
 
 const colorClasses = {
     primary: 'text-primary',
     secondary: 'text-secondary',
     accent: 'text-accent',
+    info: 'text-info',
     neutral: 'text-neutral',
     success: 'text-success',
     error: 'text-error',
