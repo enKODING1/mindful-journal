@@ -2,21 +2,14 @@
 
 import { useEffect, useState } from 'react';
 
+import Image from 'next/image';
 import Button from '@/components/ui/atom/Button';
-import { Mood } from '@/domain/models/Mood';
+import { Mood, moodOptions } from '@/domain/models/Mood';
 
 export type MoodTabProps = {
     defaultValue?: Mood;
     onChange?: (value: Mood) => void;
 };
-
-const moodTabs: { label: string; value: Mood }[] = [
-    { label: '행복', value: 'happy' },
-    { label: '슬픔', value: 'sad' },
-    { label: '화남', value: 'angry' },
-    { label: '피곤', value: 'tired' },
-    { label: '편안', value: 'relaxed' },
-];
 
 export default function MoodTab({ defaultValue = 'happy', onChange }: MoodTabProps) {
     const [selectedMood, setSelectedMood] = useState<Mood>(defaultValue);
@@ -32,14 +25,23 @@ export default function MoodTab({ defaultValue = 'happy', onChange }: MoodTabPro
     };
     return (
         <div className="w-full  rounded-xl">
-            {moodTabs.map((tab) => (
+            {moodOptions.map((option) => (
                 <Button
-                    key={tab.value}
+                    key={option.value}
                     className="m-1"
-                    soft={!(selectedMood === tab.value)}
-                    onClick={() => handleSelect(tab.value)}
+                    soft={!(selectedMood === option.value)}
+                    onClick={() => handleSelect(option.value as Mood)}
                 >
-                    {tab.label}
+                    <div className="flex items-center gap-2">
+                        <Image
+                            src={option.image}
+                            alt={option.label}
+                            width={24}
+                            height={24}
+                            className="w-6 h-6"
+                        />
+                        {option.label}
+                    </div>
                 </Button>
             ))}
         </div>

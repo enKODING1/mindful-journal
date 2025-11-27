@@ -1,8 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import Container from '../atom/Container';
 import StatCard from './StatCard';
-import { Mood, getMoodEmoji } from '@/domain/models';
+import { Mood, getMoodImage } from '@/domain/models';
 
 export interface JournalCardProps {
     date: string;
@@ -51,7 +52,15 @@ export default function JournalCard({
                 </div>
 
                 {/* 오른쪽: 무드 이모지 */}
-                <div className="text-4xl flex-shrink-0">{getMoodEmoji(mood)}</div>
+                <div className="flex-shrink-0">
+                    <Image
+                        src={getMoodImage(mood)}
+                        alt={mood}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10"
+                    />
+                </div>
             </div>
         </Container>
     );

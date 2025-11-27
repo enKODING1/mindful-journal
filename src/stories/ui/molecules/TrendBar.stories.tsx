@@ -17,8 +17,8 @@ type Story = StoryObj<typeof meta>;
 
 export const TrendBarStory: Story = {
     args: {
-        date: '10월',
-        count: 2,
-        value: 40,
+        label: '10월',
+        count: 18,
+        value: 60,
     },
 };

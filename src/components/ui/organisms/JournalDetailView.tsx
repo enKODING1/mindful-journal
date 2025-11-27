@@ -2,8 +2,9 @@
 
 import Container from '../atom/Container';
 import StatCard from '../molecules/StatCard';
+import Image from 'next/image';
 import Button from '../atom/Button';
-import { getMoodEmoji, getMoodLabel } from '@/domain/models';
+import { getMoodImage, getMoodLabel } from '@/domain/models';
 import type { Content } from '@/domain/models';
 
 export interface JournalDetailViewProps {
@@ -51,7 +52,15 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
                     </div>
 
                     <StatCard
-                        title={getMoodEmoji(journal.mood)}
+                        title={
+                            <Image
+                                src={getMoodImage(journal.mood)}
+                                alt={journal.mood}
+                                width={40}
+                                height={40}
+                                className="w-10 h-10 inline-block"
+                            />
+                        }
                         text={getMoodLabel(journal.mood)}
                         className="min-w-[120px]"
                     />
