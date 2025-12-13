@@ -41,7 +41,7 @@ export default function JournalEmptyState() {
                     </p>
                 </div>
             </div>
-            <div className="flex w-full gap-3">
+            <div className="flex w-full gap-3 flex-col items-center md:flex-row md:items-stretch">
                 {featureCards.map((card) => (
                     <FeatureCard key={card.title} {...card} />
                 ))}
