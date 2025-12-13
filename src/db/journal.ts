@@ -2,8 +2,19 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Mood, Content } from '@/domain/models';
 
 // 사용자별 전체 목록
-export async function listJournalsByUser(supabase: SupabaseClient): Promise<Content[]> {
-    const { data, error } = await supabase.from('contents').select('*');
+export async function listJournalsByUser(
+    supabase: SupabaseClient,
+    limit?: number,
+    offset?: number,
+): Promise<Content[]> {
+    let query = supabase.from('contents').select('*').order('created_at', { ascending: false });
+
+    if (limit !== undefined) {
+        const end = offset !== undefined ? offset + limit - 1 : limit - 1;
+        query = query.range(offset || 0, end);
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
 
     return data ?? [];

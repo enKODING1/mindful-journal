@@ -3,8 +3,12 @@ import * as DomainUtil from '@/domain/utils/';
 import { Content, Mood } from '@/domain/models';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-export async function listJournalsByUser(supabase: SupabaseClient): Promise<Content[]> {
-    return JournalRepo.listJournalsByUser(supabase);
+export async function listJournalsByUser(
+    supabase: SupabaseClient,
+    limit?: number,
+    offset?: number,
+): Promise<Content[]> {
+    return JournalRepo.listJournalsByUser(supabase, limit, offset);
 }
 
 export async function getJournalByDate(supabase: SupabaseClient, ymd: string): Promise<Content[]> {
