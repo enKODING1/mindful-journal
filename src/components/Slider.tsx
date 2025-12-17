@@ -59,7 +59,13 @@ export default function Slider() {
                                 <span className="ml-2">로그아웃</span>
                             </button>
                         ) : (
-                            <></>
+                            <Link
+                                href="/login"
+                                className="btn btn-ghost hover:bg-primary hover:text-primary-content transition-colors"
+                            >
+                                <LogOut size={16} className="rotate-180" />
+                                <span className="ml-2">로그인</span>
+                            </Link>
                         )}
                     </div>
                 </div>
