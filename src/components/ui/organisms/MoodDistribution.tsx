@@ -13,7 +13,14 @@ export interface MoodDistributionProps {
 export default function MoodDistribution({ stats, className = '' }: MoodDistributionProps) {
     if (stats.length === 0) {
         return (
-            <Container variant="base-100" padding="xl" gap="md" rounded="2xl" className={className}>
+            <Container
+                variant="base-100"
+                padding="xl"
+                gap="md"
+                rounded="2xl"
+                className={className}
+                centered={false}
+            >
                 <h3 className="text-xl font-bold">감정 분포</h3>
                 <p className="text-base-content/70">아직 기록된 감정이 없습니다.</p>
             </Container>

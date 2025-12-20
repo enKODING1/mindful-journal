@@ -20,6 +20,21 @@ export default function MonthlyTrend({
     title = '월별 추이',
     className = '',
 }: MonthlyTrendProps) {
+    if (data.length === 0) {
+        return (
+            <Container
+                variant="base-100"
+                padding="xl"
+                gap="md"
+                rounded="2xl"
+                className={className}
+                centered={false}
+            >
+                <h3 className="text-xl font-bold">월별 추이</h3>
+                <p className="text-base-content/70">아직 보관된 일기가 없습니다.</p>
+            </Container>
+        );
+    }
     return (
         <Container
             variant="base-100"
