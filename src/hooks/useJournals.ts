@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
-import { Content, Mood } from '@/domain/models';
+import { Content, Mood, Question } from '@/domain/models';
 import { formatJournalDate } from '@/lib/utils';
 
 const PAGE_SIZE = 7;
@@ -16,6 +16,7 @@ export function useJournals() {
     const [totalCount, setTotalCount] = useState(0);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [question, setQuestion] = useState<Question | null>(null);
     const router = useRouter();
     // supabase 클라이언트 메모이제이션
     const supabase = useMemo(() => createClient(), []);
@@ -75,7 +76,11 @@ export function useJournals() {
             setLoading(true);
             setError(null);
             try {
-                await journalService.createJournal(supabase, { content, mood });
+                await journalService.createJournal(supabase, {
+                    content,
+                    mood,
+                    questionId: question?.id,
+                });
                 // 성공 후 새로고침 또는 리다이렉트
                 router.refresh();
                 return true;
@@ -87,7 +92,7 @@ export function useJournals() {
                 setLoading(false);
             }
         },
-        [supabase, router],
+        [supabase, router, question],
     );
 
     // 특정 날짜 일기
@@ -125,17 +130,34 @@ export function useJournals() {
         }
     }, [supabase]);
 
+    // 다음 질문 가져오기
+    const fetchNextQuestion = useCallback(async () => {
+        try {
+            const data = await journalService.getNextQuestion(supabase);
+            setQuestion(data);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : '질문을 불러오는데 실패했습니다';
+            setError(message);
+        }
+    }, [supabase]);
+
+    // 오늘 작성 여부 체크
+    const hasWrittenTodayCheck = journalService.hasWrittenToday(journals);
+
     return {
         journals,
         loading,
         error,
         totalCount,
         hasMore,
+        question,
+        hasWrittenTodayCheck,
         fetchJournals,
         fetchJournalsPaginated,
         loadMore,
         createJournal,
         fetchJournalsByDate,
         countJournalsByUser,
+        fetchNextQuestion,
     };
 }

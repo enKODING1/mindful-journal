@@ -1,6 +1,6 @@
 import * as JournalRepo from '@/db/journal';
 import * as DomainUtil from '@/domain/utils/';
-import { Content, Mood } from '@/domain/models';
+import { Content, Mood, Question } from '@/domain/models';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export async function listJournalsByUser(
@@ -24,7 +24,7 @@ export async function getJournalById(
 
 export async function createJournal(
     supabase: SupabaseClient,
-    input: { content: string; mood: Mood },
+    input: { content: string; mood: Mood; questionId?: number },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
     // Get current user
     const {
@@ -43,6 +43,7 @@ export async function createJournal(
         userId: user.id,
         content: input.content,
         mood: input.mood,
+        questionId: input.questionId,
     });
 }
 
@@ -52,4 +53,8 @@ export function hasWrittenToday(contents: Content[]): boolean {
 
 export async function countJournalsByUser(supabase: SupabaseClient): Promise<number> {
     return JournalRepo.countJournalsByUser(supabase);
+}
+
+export async function getNextQuestion(supabase: SupabaseClient): Promise<Question | null> {
+    return JournalRepo.getNextQuestion(supabase);
 }

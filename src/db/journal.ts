@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Mood, Content } from '@/domain/models';
+import { Mood, Content, Question } from '@/domain/models';
 
 // 사용자별 전체 목록
 export async function listJournalsByUser(
@@ -87,11 +87,16 @@ export async function hasWrittenToday(
 // 일기 생성
 export async function createJournal(
     supabase: SupabaseClient,
-    input: { userId: string; content: string; mood: Mood },
+    input: { userId: string; content: string; mood: Mood; questionId?: number },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
     const { data, error } = await supabase
         .from('contents')
-        .insert({ user_id: input.userId, content: input.content, mood: input.mood })
+        .insert({
+            user_id: input.userId,
+            content: input.content,
+            mood: input.mood,
+            question_id: input.questionId,
+        })
         .select('id, created_at')
         .single();
 
@@ -123,4 +128,17 @@ export async function countJournalsByUser(supabase: SupabaseClient): Promise<num
     if (error) throw error;
 
     return count ?? 0;
+}
+
+// 다음 질문 가져오기
+export async function getNextQuestion(supabase: SupabaseClient): Promise<Question | null> {
+    const { data, error } = await supabase.rpc('get_next_question');
+    if (error) throw error;
+
+    // RPC가 배열을 반환하는 경우 첫 번째 요소 추출
+    if (Array.isArray(data) && data.length > 0) {
+        return data[0];
+    }
+
+    return data;
 }

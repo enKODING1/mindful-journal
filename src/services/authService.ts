@@ -44,7 +44,7 @@ export async function loginWithPassword(
 }
 
 export async function loginWithGoogle(supabase: SupabaseClient) {
-    const redirectTo = `${window.location.origin}/auth/callback?next=/`;
+    const redirectTo = `${window.location.origin}/auth/callback?next=`;
     return AuthRepo.loginWithGoogle(supabase, redirectTo);
 }
 

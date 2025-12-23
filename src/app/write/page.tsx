@@ -9,12 +9,21 @@ import { useJournals } from '@/hooks';
 import { Mood } from '@/domain/models';
 
 export default function Write() {
-    const { createJournal, loading, error, hasWrittenTodayCheck, fetchJournals } = useJournals();
+    const {
+        createJournal,
+        loading,
+        error,
+        hasWrittenTodayCheck,
+        fetchJournals,
+        question,
+        fetchNextQuestion,
+    } = useJournals();
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // 페이지 로드 시 일기 목록 가져오기 (오늘 작성 여부 체크용)
+    // 페이지 로드 시 일기 목록 가져오기 (오늘 작성 여부 체크용) + 질문 가져오기
     useEffect(() => {
         fetchJournals();
+        fetchNextQuestion();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -38,7 +47,7 @@ export default function Write() {
     return (
         <Container className="mt-10" variant="base-100" padding="xl" gap="md" rounded="2xl">
             <h2 className="text-2xl font-bold">오늘의 일기</h2>
-            <p>하루중 기억하고 싶은 순간은 무엇인가요?</p>
+            <p>{question?.question ?? '하루중 기억하고 싶은 순간은 무엇인가요?'}</p>
 
             {successMessage && (
                 <Alert color="success">
