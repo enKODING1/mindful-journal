@@ -10,45 +10,50 @@
         "start": "next start",
         "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
         "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
-        "prepare": "husky"
-    },
-    "lint-staged": {
-        "*.{ts,tsx,js,jsx}": [
-            "eslint --fix",
-            "prettier --write"
-        ],
-        "*.{json,md,css}": [
-            "prettier --write"
-        ]
+        "prepare": "husky",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build"
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.1",
-        "@next/third-parties": "^15.5.6",
+        "@next/third-parties": "^16.0.10",
         "@supabase/auth-helpers-nextjs": "^0.10.0",
         "@supabase/ssr": "^0.7.0",
         "@supabase/supabase-js": "^2.57.2",
         "lucide-react": "^0.543.0",
-        "next": "15.5.2",
-        "react": "19.1.0",
+        "next": "^16.0.10",
+        "react": "^19.2.3",
         "react-day-picker": "^9.9.0",
-        "react-dom": "19.1.0"
+        "react-dom": "^19.2.3"
     },
     "devDependencies": {
+        "@chromatic-com/storybook": "^4.1.2",
         "@eslint/eslintrc": "^3",
+        "@storybook/addon-a11y": "^10.0.6",
+        "@storybook/addon-docs": "^10.0.6",
+        "@storybook/addon-onboarding": "^10.0.6",
+        "@storybook/addon-vitest": "^10.0.6",
+        "@storybook/nextjs-vite": "^10.0.6",
         "@tailwindcss/postcss": "^4",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "@typescript-eslint/eslint-plugin": "^8.42.0",
         "@typescript-eslint/parser": "^8.42.0",
+        "@vitest/browser-playwright": "^4.0.8",
+        "@vitest/coverage-v8": "^4.0.8",
         "daisyui": "^5.1.7",
         "eslint": "^9.35.0",
         "eslint-config-next": "15.5.2",
         "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-storybook": "^10.0.6",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.3",
+        "playwright": "^1.56.1",
         "prettier": "^3.6.2",
+        "storybook": "^10.0.6",
         "tailwindcss": "^4",
-        "typescript": "^5"
+        "typescript": "^5",
+        "vitest": "^4.0.8"
     }
 }
