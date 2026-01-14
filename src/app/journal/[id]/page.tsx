@@ -1,5 +1,5 @@
 import createServerClient from '@/db/supabase/server';
-import * as JournalRepo from '@/db/journal';
+import * as JournalService from '@/services/journalService';
 import JournalDetailClient from './JournalDetailClient';
 
 interface JournalDetailPageProps {
@@ -16,7 +16,7 @@ export default async function JournalDetailPage({ params }: JournalDetailPagePro
 
     try {
         const supabase = await createServerClient();
-        const journal = await JournalRepo.getJournalById(supabase, journalId);
+        const journal = await JournalService.getJournalById(supabase, journalId);
 
         if (!journal) {
             return <JournalDetailClient journal={null} error="일기를 찾을 수 없습니다" />;
