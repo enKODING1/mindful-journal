@@ -3,9 +3,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import JournalForm from '@/components/ui/organisms/JournalForm';
-import Container from '@/components/ui/atom/Container';
 import Alert from '@/components/ui/atom/Alert';
-import JournalCalendar from '@/components/ui/organisms/JournalCalendar';
 import { Mood, Question } from '@/domain/models';
 import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
@@ -71,39 +69,41 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
 
     if (hasWrittenToday) {
         return (
-            <Container className="mt-10" variant="base-100" padding="xl" gap="md" rounded="2xl">
-                <h2 className="text-2xl font-bold">오늘의 일기</h2>
-                <p>오늘의 이야기를 이미 보관했어요!</p>
-            </Container>
+            <div className="mt-16 max-w-2xl mx-auto px-4">
+                <div className="text-center py-12">
+                    <p className="text-xl text-base-content/70">
+                        오늘의 이야기를 이미 보관했어요 ✨
+                    </p>
+                </div>
+            </div>
         );
     }
 
     return (
-        <Container className="mt-10" variant="base-100" padding="xl" gap="md" rounded="2xl">
-            <h2 className="text-2xl font-bold">오늘의 일기</h2>
-            <p>{question?.question ?? '하루중 기억하고 싶은 순간은 무엇인가요?'}</p>
+        <div className="mt-16 max-w-2xl mx-auto px-4">
+            {/* 질문 */}
+            <p className="text-lg text-base-content/80 mb-8 text-center">
+                {question?.question ?? '하루 중 기억하고 싶은 순간은 무엇인가요?'}
+            </p>
 
+            {/* 알림 메시지 */}
             {successMessage && (
-                <Alert color="success">
+                <Alert color="success" className="mb-4">
                     <span>{successMessage}</span>
                 </Alert>
             )}
-
             {error && (
-                <Alert color="error">
+                <Alert color="error" className="mb-4">
                     <span>{error}</span>
                 </Alert>
             )}
 
+            {/* 폼 */}
             <JournalForm
                 onSubmit={handleSubmit}
                 submitButtonText={loading ? '저장 중...' : '저장'}
+                variant="base-200"
             />
-
-            <div className="mt-8">
-                <h3 className="text-xl font-bold mb-4">일기 작성 캘린더</h3>
-                <JournalCalendar />
-            </div>
-        </Container>
+        </div>
     );
 }
