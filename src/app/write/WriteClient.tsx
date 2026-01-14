@@ -27,14 +27,38 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
             setLoading(true);
             setError(null);
             try {
-                await journalService.createJournal(supabase, {
+                // 1. 일기 저장
+                const result = await journalService.createJournal(supabase, {
                     content,
                     mood,
                     questionId: question?.id,
                 });
+
+                // 2. Gemini API 호출
+                try {
+                    const res = await fetch('/api/gemini', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: content }),
+                    });
+                    const { text } = await res.json();
+
+                    // 3. AI 댓글 저장
+                    if (text) {
+                        await journalService.addComment(supabase, {
+                            contentId: result.id,
+                            body: text,
+                            type: 'AI',
+                        });
+                    }
+                } catch {
+                    // Gemini 호출 실패해도 일기는 이미 저장됨
+                    console.error('Gemini API 호출 실패');
+                }
+
                 setSuccessMessage('오늘의 이야기를 보관했어요!');
-                setTimeout(() => setSuccessMessage(null), 2000);
-                router.refresh();
+                // 상세 페이지로 이동
+                router.push(`/journal/${result.id}`);
             } catch (err) {
                 const message = err instanceof Error ? err.message : '일기 작성에 실패했습니다';
                 setError(message);

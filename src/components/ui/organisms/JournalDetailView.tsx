@@ -74,6 +74,23 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
                     </p>
                 </div>
             </Container>
+
+            {/* AI 피드백 섹션 */}
+            {journal.comments && journal.comments.length > 0 && (
+                <Container variant="base-200" padding="xl" gap="md" rounded="2xl">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                        🤖 마음챙김봇의 한마디
+                    </h3>
+                    {journal.comments.map((comment) => (
+                        <p
+                            key={comment.id}
+                            className="text-base-content/80 leading-relaxed whitespace-pre-wrap"
+                        >
+                            {comment.comment_body}
+                        </p>
+                    ))}
+                </Container>
+            )}
         </Container>
     );
 }

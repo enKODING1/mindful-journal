@@ -58,3 +58,23 @@ export async function countJournalsByUser(supabase: SupabaseClient): Promise<num
 export async function getNextQuestion(supabase: SupabaseClient): Promise<Question | null> {
     return JournalRepo.getNextQuestion(supabase);
 }
+
+export async function addComment(
+    supabase: SupabaseClient,
+    input: { contentId: number; body: string; type?: 'AI' | 'USER' },
+): Promise<void> {
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+        throw new Error('로그인이 필요합니다');
+    }
+
+    return JournalRepo.addComment(supabase, {
+        contentId: input.contentId,
+        body: input.body,
+        userId: user.id,
+        type: input.type,
+    });
+}
