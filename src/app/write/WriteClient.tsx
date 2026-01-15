@@ -7,6 +7,7 @@ import Alert from '@/components/ui/atom/Alert';
 import { Mood, Question } from '@/domain/models';
 import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
+import { encrypt } from '@/lib/crypto';
 
 interface WriteClientProps {
     hasWrittenToday: boolean;
@@ -26,11 +27,15 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
             setError(null);
             try {
                 // 1. 일기 저장
-                const result = await journalService.createJournal(supabase, {
-                    content,
-                    mood,
-                    questionId: question?.id,
+                const result = await fetch('/api/write', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, mood, questionId: question?.id }),
                 });
+                if (!result.ok) {
+                    throw new Error('일기 저장에 실패했습니다');
+                }
+                const resultJson = await result.json().then((res) => res.data);
 
                 // 2. Gemini API 호출
                 try {
@@ -44,7 +49,7 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
                     // 3. AI 댓글 저장
                     if (text) {
                         await journalService.addComment(supabase, {
-                            contentId: result.id,
+                            contentId: resultJson.id,
                             body: text,
                             type: 'AI',
                         });
@@ -56,7 +61,7 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
 
                 setSuccessMessage('오늘의 이야기를 보관했어요!');
                 // 상세 페이지로 이동
-                router.push(`/journal/${result.id}`);
+                router.push(`/journal/${resultJson.id}`);
             } catch (err) {
                 const message = err instanceof Error ? err.message : '일기 작성에 실패했습니다';
                 setError(message);
