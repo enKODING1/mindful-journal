@@ -1,7 +1,7 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const getKey = () => Buffer.from(process.env.NEXT_PUBLIC_ENCRYPTION_KEY || '', 'hex');
+const getKey = () => Buffer.from(process.env.ENCRYPTION_KEY || '', 'hex');
 
 export const encrypt = (text: string): string => {
     const key = getKey();
