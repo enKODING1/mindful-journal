@@ -11,40 +11,6 @@ export function useAuth() {
     const router = useRouter();
     const supabase = createClient();
 
-    // 이메일/비밀번호 로그인
-    const login = async (email: string, password: string) => {
-        setLoading(true);
-        setError(undefined);
-        try {
-            await authService.loginWithPassword(supabase, { email, password });
-            router.push('/');
-            return true;
-        } catch (err) {
-            const message = err instanceof Error ? err.message : '로그인에 실패했습니다';
-            setError(message);
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // 회원가입
-    const signUp = async (email: string, password: string, alias?: string) => {
-        setLoading(true);
-        setError(undefined);
-        try {
-            await authService.signUp(supabase, { email, password, alias });
-            router.push('/');
-            return true;
-        } catch (err) {
-            const message = err instanceof Error ? err.message : '회원가입에 실패했습니다';
-            setError(message);
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
-
     // 구글 로그인
     const loginWithGoogle = async () => {
         setLoading(true);
@@ -81,8 +47,6 @@ export function useAuth() {
     return {
         loading,
         error,
-        login,
-        signUp,
         loginWithGoogle,
         logout,
     };
