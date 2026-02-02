@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import Slider from '@/components/Slider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import GoogleAdSense from '@/components/GoogleAdSense';
 import './globals.css';
 
 const geistSans = Geist({
@@ -31,7 +30,6 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-300 min-h-screen`}
             >
                 <GoogleAnalytics />
-                <GoogleAdSense />
                 <Slider />
                 {children}
             </body>
