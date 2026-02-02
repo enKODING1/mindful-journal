@@ -37,27 +37,27 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
                 }
                 const resultJson = await result.json().then((res) => res.data);
 
-                // 2. Gemini API 호출
-                try {
-                    const res = await fetch('/api/gemini', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: content }),
-                    });
-                    const { text } = await res.json();
+                // // 2. Gemini API 호출
+                // try {
+                //     const res = await fetch('/api/gemini', {
+                //         method: 'POST',
+                //         headers: { 'Content-Type': 'application/json' },
+                //         body: JSON.stringify({ prompt: content }),
+                //     });
+                //     const { text } = await res.json();
 
-                    // 3. AI 댓글 저장
-                    if (text) {
-                        await journalService.addComment(supabase, {
-                            contentId: resultJson.id,
-                            body: text,
-                            type: 'AI',
-                        });
-                    }
-                } catch {
-                    // Gemini 호출 실패해도 일기는 이미 저장됨
-                    console.error('Gemini API 호출 실패');
-                }
+                //     // 3. AI 댓글 저장
+                //     if (text) {
+                //         await journalService.addComment(supabase, {
+                //             contentId: resultJson.id,
+                //             body: text,
+                //             type: 'AI',
+                //         });
+                //     }
+                // } catch {
+                //     // Gemini 호출 실패해도 일기는 이미 저장됨
+                //     console.error('Gemini API 호출 실패');
+                // }
 
                 setSuccessMessage('오늘의 이야기를 보관했어요!');
                 // 상세 페이지로 이동

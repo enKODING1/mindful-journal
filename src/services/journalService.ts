@@ -17,14 +17,14 @@ export async function getJournalByDate(supabase: SupabaseClient, ymd: string): P
 
 export async function getJournalById(
     supabase: SupabaseClient,
-    id: number,
+    id: string,
 ): Promise<Content | null> {
     return JournalRepo.getJournalById(supabase, id);
 }
 
 export async function createJournal(
     supabase: SupabaseClient,
-    input: { content: string; mood: Mood; questionId?: number },
+    input: { content: string; mood: Mood; questionId?: number; date?: string },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
     // Get current user
     const {
@@ -44,6 +44,7 @@ export async function createJournal(
         content: input.content,
         mood: input.mood,
         questionId: input.questionId,
+        date: input.date,
     });
 }
 
@@ -61,7 +62,7 @@ export async function getNextQuestion(supabase: SupabaseClient): Promise<Questio
 
 export async function addComment(
     supabase: SupabaseClient,
-    input: { contentId: number; body: string; type?: 'AI' | 'USER' },
+    input: { contentId: string; body: string; type?: 'AI' | 'USER' },
 ): Promise<void> {
     const {
         data: { user },

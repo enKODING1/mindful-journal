@@ -2,7 +2,7 @@ import { Mood } from './Mood';
 import { Comment } from './Comment';
 
 export interface Content {
-    id: number;
+    id: string;
     created_at: string;
     content: string;
     mood: Mood;

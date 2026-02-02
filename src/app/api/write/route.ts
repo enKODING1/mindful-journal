@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import createClient from '@/db/supabase/server';
 import * as journalService from '@/services/journalService';
 import { encrypt } from '@/lib/crypto';
+import { getToday } from '@/lib/utils';
 
 export async function POST(req: Request) {
     try {
@@ -15,6 +16,7 @@ export async function POST(req: Request) {
             content: encrypt(content),
             mood,
             questionId,
+            date: getToday(),
         });
 
         return NextResponse.json({ success: true, data: result });

@@ -27,9 +27,9 @@ export async function getJournalByDate(supabase: SupabaseClient, ymd: string): P
         .select(
             `
     *,
-    comments(
+    ai_comments(
       id,
-      comment_body,
+      comment,
       created_at
     )
   `,
@@ -45,16 +45,16 @@ export async function getJournalByDate(supabase: SupabaseClient, ymd: string): P
 // 특정 ID의 일기 가져오기
 export async function getJournalById(
     supabase: SupabaseClient,
-    id: number,
+    id: string,
 ): Promise<Content | null> {
     const { data, error } = await supabase
         .from('contents')
         .select(
             `
     *,
-    comments(
+    ai_comments(
       id,
-      comment_body,
+      comment,
       created_at
     )
   `,
@@ -87,7 +87,7 @@ export async function hasWrittenToday(
 // 일기 생성
 export async function createJournal(
     supabase: SupabaseClient,
-    input: { userId: string; content: string; mood: Mood; questionId?: number },
+    input: { userId: string; content: string; mood: Mood; questionId?: number; date?: string },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
     const { data, error } = await supabase
         .from('contents')
@@ -96,6 +96,7 @@ export async function createJournal(
             content: input.content,
             mood: input.mood,
             question_id: input.questionId,
+            date: input.date,
         })
         .select('id, created_at')
         .single();
@@ -107,11 +108,11 @@ export async function createJournal(
 // 댓글 추가
 export async function addComment(
     supabase: SupabaseClient,
-    input: { contentId: number; body: string; userId: string; type?: 'AI' | 'USER' },
+    input: { contentId: string; body: string; userId: string; type?: 'AI' | 'USER' },
 ): Promise<void> {
-    const { error } = await supabase.from('comments').insert({
+    const { error } = await supabase.from('ai_comments').insert({
         content_id: input.contentId,
-        comment_body: input.body,
+        comment: input.body,
         user_id: input.userId,
         comment_type: input.type ?? 'USER',
     });
