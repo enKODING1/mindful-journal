@@ -9,15 +9,16 @@ interface JournalDetailPageProps {
 
 export default async function JournalDetailPage({ params }: JournalDetailPageProps) {
     const { id } = await params;
-    const journalId = parseInt(id, 10);
 
-    if (isNaN(journalId)) {
+    if (!id) {
         return <JournalDetailClient journal={null} error="잘못된 일기 ID입니다" />;
     }
-
+    console.log(`id: ${id}`);
     try {
         const supabase = await createServerClient();
-        const journal = await JournalService.getJournalById(supabase, journalId);
+        console.log('supabase');
+        const journal = await JournalService.getJournalById(supabase, id);
+        console.log(`journal: ${JSON.stringify(journal)}`);
         if (!journal) {
             return <JournalDetailClient journal={null} error="일기를 찾을 수 없습니다" />;
         }

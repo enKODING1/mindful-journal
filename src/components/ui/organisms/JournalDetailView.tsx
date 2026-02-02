@@ -67,7 +67,7 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
                             key={comment.id}
                             className="text-base-content/70 leading-relaxed whitespace-pre-wrap"
                         >
-                            {comment.comment_body}
+                            {comment.comment}
                         </p>
                     ))}
                 </div>
