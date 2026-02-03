@@ -115,9 +115,13 @@ export async function encryptDiary(content: string): Promise<{ iv: string; data:
     }
 
     // 마스터키를 CryptoKey로 변환
-    const key = await crypto.subtle.importKey('raw', masterKey, { name: 'AES-GCM' }, false, [
-        'encrypt',
-    ]);
+    const key = await crypto.subtle.importKey(
+        'raw',
+        masterKey as BufferSource,
+        { name: 'AES-GCM' },
+        false,
+        ['encrypt'],
+    );
 
     return encryptText(content, key);
 }
@@ -132,9 +136,13 @@ export async function decryptDiary(encrypted: { iv: string; data: string }): Pro
     }
 
     // 마스터키를 CryptoKey로 변환
-    const key = await crypto.subtle.importKey('raw', masterKey, { name: 'AES-GCM' }, false, [
-        'decrypt',
-    ]);
+    const key = await crypto.subtle.importKey(
+        'raw',
+        masterKey as BufferSource,
+        { name: 'AES-GCM' },
+        false,
+        ['decrypt'],
+    );
 
     return decryptText(encrypted, key);
 }

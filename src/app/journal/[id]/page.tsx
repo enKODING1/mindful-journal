@@ -1,7 +1,6 @@
 import createServerClient from '@/db/supabase/server';
 import * as JournalService from '@/services/journalService';
 import JournalDetailClient from './JournalDetailClient';
-import { decrypt } from '@/lib/crypto';
 
 interface JournalDetailPageProps {
     params: Promise<{ id: string }>;
@@ -13,21 +12,17 @@ export default async function JournalDetailPage({ params }: JournalDetailPagePro
     if (!id) {
         return <JournalDetailClient journal={null} error="잘못된 일기 ID입니다" />;
     }
-    console.log(`id: ${id}`);
+
     try {
         const supabase = await createServerClient();
-        console.log('supabase');
         const journal = await JournalService.getJournalById(supabase, id);
-        console.log(`journal: ${JSON.stringify(journal)}`);
+
         if (!journal) {
             return <JournalDetailClient journal={null} error="일기를 찾을 수 없습니다" />;
         }
-        const decryptedJournal = {
-            ...journal,
-            content: decrypt(journal.content),
-        };
 
-        return <JournalDetailClient journal={decryptedJournal} />;
+        // 암호화된 상태로 클라이언트에 전달 (클라이언트에서 복호화)
+        return <JournalDetailClient journal={journal} />;
     } catch {
         return <JournalDetailClient journal={null} error="일기를 불러오는데 실패했습니다" />;
     }

@@ -1,9 +1,12 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import JournalDetailView from '@/components/ui/organisms/JournalDetailView';
 import Container from '@/components/ui/atom/Container';
 import type { Content } from '@/domain/models';
+import { decryptText } from '@/lib/crypto';
+import { getMasterKey } from '@/lib/useMasterKey';
 
 interface JournalDetailClientProps {
     journal: Content | null;
@@ -12,16 +15,83 @@ interface JournalDetailClientProps {
 
 export default function JournalDetailClient({ journal, error }: JournalDetailClientProps) {
     const router = useRouter();
+    const [decryptedJournal, setDecryptedJournal] = useState<Content | null>(null);
+    const [decryptError, setDecryptError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const decryptContent = async () => {
+            if (!journal) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const masterKey = getMasterKey();
+                if (!masterKey) {
+                    setDecryptError('암호화 키가 없습니다. 다시 로그인해주세요.');
+                    setLoading(false);
+                    return;
+                }
+
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    masterKey as BufferSource,
+                    { name: 'AES-GCM' },
+                    false,
+                    ['decrypt'],
+                );
+
+                let decryptedContent = journal.content;
+
+                try {
+                    // JSON 형식인 경우 파싱 시도
+                    const parsed = JSON.parse(journal.content);
+                    if (parsed.iv && parsed.data) {
+                        decryptedContent = await decryptText(parsed, cryptoKey);
+                    }
+                } catch {
+                    // JSON 파싱 실패 = 이미 평문이거나 다른 형식
+                    // 그대로 사용
+                }
+
+                setDecryptedJournal({
+                    ...journal,
+                    content: decryptedContent,
+                });
+            } catch (err) {
+                console.error('Decryption failed:', err);
+                setDecryptError('일기 복호화에 실패했습니다');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        decryptContent();
+    }, [journal]);
 
     const handleBack = () => {
         router.push('/');
     };
 
-    if (error || !journal) {
+    if (loading) {
+        return (
+            <Container className="mt-10" variant="base-300" padding="xl" gap="lg" rounded="2xl">
+                <div className="flex flex-col items-center justify-center py-12">
+                    <span className="loading loading-spinner loading-lg text-primary"></span>
+                    <p className="text-base-content/70 mt-4">일기를 복호화하는 중...</p>
+                </div>
+            </Container>
+        );
+    }
+
+    if (error || decryptError || !decryptedJournal) {
         return (
             <Container className="mt-10" variant="base-300" padding="xl" gap="lg" rounded="2xl">
                 <div className="text-center py-12">
-                    <p className="text-error mb-4">{error || '일기를 찾을 수 없습니다'}</p>
+                    <p className="text-error mb-4">
+                        {error || decryptError || '일기를 찾을 수 없습니다'}
+                    </p>
                     <button onClick={handleBack} className="btn btn-primary">
                         목록으로 돌아가기
                     </button>
@@ -32,7 +102,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
 
     return (
         <div className="mt-10">
-            <JournalDetailView journal={journal} onBack={handleBack} />
+            <JournalDetailView journal={decryptedJournal} onBack={handleBack} />
         </div>
     );
 }

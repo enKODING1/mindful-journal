@@ -1,49 +1,22 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import JournalList from '@/components/ui/organisms/JournalList';
 import Container from '@/components/ui/atom/Container';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import type { Content } from '@/domain/models';
 import Loading from '@/components/ui/atom/Loading';
-import createClient from '@/db/supabase/client';
-import * as journalService from '@/services/journalService';
-
-const PAGE_SIZE = 7;
+import { useJournals, JournalProvider } from '@/contexts/JournalContext';
 
 interface HomeClientProps {
     initialJournals: Content[];
     initialHasMore: boolean;
 }
 
-export default function HomeClient({ initialJournals, initialHasMore }: HomeClientProps) {
-    const [journals, setJournals] = useState<Content[]>(initialJournals);
-    const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(initialHasMore);
-    const [page, setPage] = useState(0);
+function HomeContent() {
+    const { journals, loading, hasMore, loadMore } = useJournals();
     const router = useRouter();
-    const supabase = createClient();
-
-    // 더 불러오기 (클라이언트에서만 실행)
-    const loadMore = useCallback(async () => {
-        if (!hasMore || loading) return;
-
-        setLoading(true);
-        try {
-            const nextPage = page + 1;
-            const offset = nextPage * PAGE_SIZE;
-            const data = await journalService.listJournalsByUser(supabase, PAGE_SIZE, offset);
-
-            setJournals((prev) => [...prev, ...data]);
-            setPage(nextPage);
-            setHasMore(data.length === PAGE_SIZE);
-        } catch (err) {
-            console.error('Failed to load more journals:', err);
-        } finally {
-            setLoading(false);
-        }
-    }, [hasMore, loading, page, supabase]);
 
     // 무한 스크롤 콜백
     const handleIntersect = useCallback(() => {
@@ -94,5 +67,13 @@ export default function HomeClient({ initialJournals, initialHasMore }: HomeClie
                 </p>
             )}
         </Container>
+    );
+}
+
+export default function HomeClient({ initialJournals, initialHasMore }: HomeClientProps) {
+    return (
+        <JournalProvider initialJournals={initialJournals} initialHasMore={initialHasMore}>
+            <HomeContent />
+        </JournalProvider>
     );
 }

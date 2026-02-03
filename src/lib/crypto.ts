@@ -56,7 +56,7 @@ export async function deriveKey(password: string, salt: Uint8Array): Promise<Cry
     return crypto.subtle.deriveKey(
         {
             name: 'PBKDF2',
-            salt: salt,
+            salt: salt as BufferSource,
             iterations: 600000, // 60만 번 반복 (보안 강화)
             hash: 'SHA-256',
         },
@@ -78,7 +78,11 @@ export async function encrypt(
     const iv = crypto.getRandomValues(new Uint8Array(12));
 
     // 암호화
-    const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, data);
+    const encrypted = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv: iv as BufferSource },
+        key,
+        data as BufferSource,
+    );
 
     // Base64로 인코딩해서 반환
     return {

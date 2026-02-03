@@ -7,7 +7,8 @@ import Alert from '@/components/ui/atom/Alert';
 import { Mood, Question } from '@/domain/models';
 import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
-import { encrypt } from '@/lib/crypto';
+import { encryptText } from '@/lib/crypto';
+import { getMasterKey } from '@/lib/useMasterKey';
 
 interface WriteClientProps {
     hasWrittenToday: boolean;
@@ -26,38 +27,38 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
             setLoading(true);
             setError(null);
             try {
-                // 1. 일기 저장
+                // 1. localStorage에서 마스터키 가져오기
+                const masterKey = getMasterKey();
+                if (!masterKey) {
+                    throw new Error('암호화 키가 없습니다. 다시 로그인해주세요.');
+                }
+
+                // 2. 마스터키를 CryptoKey로 변환
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    masterKey as BufferSource,
+                    { name: 'AES-GCM' },
+                    false,
+                    ['encrypt'],
+                );
+
+                // 3. 일기 내용 암호화
+                const encryptedContent = await encryptText(content, cryptoKey);
+
+                // 4. 암호화된 일기 저장 (iv와 data 모두 저장)
                 const result = await fetch('/api/write', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, mood, questionId: question?.id }),
+                    body: JSON.stringify({
+                        content: JSON.stringify(encryptedContent),
+                        mood,
+                        questionId: question?.id,
+                    }),
                 });
                 if (!result.ok) {
                     throw new Error('일기 저장에 실패했습니다');
                 }
                 const resultJson = await result.json().then((res) => res.data);
-
-                // // 2. Gemini API 호출
-                // try {
-                //     const res = await fetch('/api/gemini', {
-                //         method: 'POST',
-                //         headers: { 'Content-Type': 'application/json' },
-                //         body: JSON.stringify({ prompt: content }),
-                //     });
-                //     const { text } = await res.json();
-
-                //     // 3. AI 댓글 저장
-                //     if (text) {
-                //         await journalService.addComment(supabase, {
-                //             contentId: resultJson.id,
-                //             body: text,
-                //             type: 'AI',
-                //         });
-                //     }
-                // } catch {
-                //     // Gemini 호출 실패해도 일기는 이미 저장됨
-                //     console.error('Gemini API 호출 실패');
-                // }
 
                 setSuccessMessage('오늘의 이야기를 보관했어요!');
                 // 상세 페이지로 이동
@@ -76,9 +77,7 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
         return (
             <div className="mt-16 max-w-2xl mx-auto px-4">
                 <div className="text-center py-12">
-                    <p className="text-xl text-base-content/70">
-                        오늘의 이야기를 이미 보관했어요 ✨
-                    </p>
+                    <p className="text-xl text-base-content/70">오늘의 이야기를 이미 보관했어요!</p>
                 </div>
             </div>
         );
