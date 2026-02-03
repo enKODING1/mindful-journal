@@ -32,7 +32,9 @@ export default function RootLayout({
             >
                 <GoogleAnalytics />
                 <Slider />
-                <MasterKeyProvider>{children}</MasterKeyProvider>
+                <MasterKeyProvider>
+                    <main className="pb-16 md:pb-0">{children}</main>
+                </MasterKeyProvider>
             </body>
         </html>
     );
