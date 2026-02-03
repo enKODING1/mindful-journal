@@ -17,6 +17,7 @@ import {
     CheckCircle,
 } from 'lucide-react';
 import createClient from '@/db/supabase/client';
+import { deriveKey, encrypt, generateMasterKey, encryptText } from '@/lib/crypto';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -69,11 +70,8 @@ export default function SetupEncryptionClient() {
             return;
         }
 
-        // Step 4로 이동
-        setStep(4);
-        setShowWarning(false);
-
         setLoading(true);
+        setShowWarning(false);
 
         try {
             const {
@@ -82,23 +80,41 @@ export default function SetupEncryptionClient() {
 
             if (!user) {
                 setError('로그인이 필요합니다');
+                setLoading(false);
                 return;
             }
 
-            // encryption_keys 테이블에 저장
+            console.log('마스터키 생성...');
+            const masterKey = generateMasterKey();
+
+            console.log('비밀번호 솔트 생성...');
+            const passwordSalt = crypto.getRandomValues(new Uint8Array(16));
+
+            console.log('비밀번호 키 생성...');
+            const passwordKey = await deriveKey(password, passwordSalt);
+
+            console.log('마스터키 암호화...');
+            const encryptedMasterKey = await encrypt(masterKey, passwordKey);
+
+            console.log('검증 토큰 생성...');
+            const verificationToken = await encryptText('VALID_KEY_V1', passwordKey);
+
+            // // encryption_keys 테이블에 저장
             const { error: insertError } = await supabase.from('encryption_keys').insert({
                 user_id: user.id,
-                // password_salt:
-                // encrypted_master_key
-                // verification_token
+                password_salt: passwordSalt,
+                encrypted_master_key: encryptedMasterKey,
+                verification_token: verificationToken,
             });
 
             if (insertError) {
                 setError('암호 저장에 실패했습니다');
+                setLoading(false);
                 return;
             }
 
-            router.push('/');
+            // 성공 시 Step 4로 이동
+            setStep(4);
         } catch {
             setError('오류가 발생했습니다');
         } finally {
@@ -399,10 +415,9 @@ export default function SetupEncryptionClient() {
                             variant="primary"
                             size="lg"
                             className="w-full"
-                            onClick={handleSubmit}
-                            disabled={loading}
+                            onClick={() => router.push('/')}
                         >
-                            {loading ? '저장 중...' : '일기 쓰러 가기'}
+                            일기 쓰러 가기
                         </Button>
                     </div>
                 )}
