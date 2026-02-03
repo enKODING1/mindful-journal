@@ -29,6 +29,18 @@ export async function proxy(req: NextRequest) {
     if (!user) {
         return NextResponse.redirect(new URL('/login', req.url));
     }
+    // setup-encryption
+    const { data: encryption_key } = await supabase
+        .from('encryption_keys')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+    console.log('encryption_key');
+    // console.log(encryption_key);
+
+    if (!encryption_key) {
+        return NextResponse.redirect(new URL('/setup-encryption', req.url));
+    }
 
     return res;
 }
