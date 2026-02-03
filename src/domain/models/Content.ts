@@ -1,11 +1,14 @@
 import { Mood } from './Mood';
 import { Comment } from './Comment';
+import { Question } from './Question';
 
 export interface Content {
     id: string;
     created_at: string;
     content: string;
     mood: Mood;
+    question_id?: number;
+    question?: Question;
     comments?: Comment[];
 }
 

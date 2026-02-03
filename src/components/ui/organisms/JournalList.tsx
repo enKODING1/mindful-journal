@@ -76,17 +76,31 @@ export default function JournalList({ journals, onJournalClick }: JournalListPro
 
                     {/* 해당 월의 일기 목록 */}
                     <div className="flex flex-col gap-3">
-                        {group.journals.map((journal) => (
-                            <JournalCard
-                                key={journal.id}
-                                date={formatDay(journal.created_at)}
-                                dayOfWeek={formatDayOfWeek(journal.created_at)}
-                                title={journal.content.split('\n')[0] || '제목 없음'}
-                                content={journal.content}
-                                mood={journal.mood}
-                                onClick={() => onJournalClick?.(journal)}
-                            />
-                        ))}
+                        {group.journals.map((journal) => {
+                            // 질문이 있으면 질문을 제목으로, 없으면 첫 줄을 제목으로
+                            const title =
+                                journal.question?.question ||
+                                journal.content.split('\n')[0] ||
+                                '제목 없음';
+                            // 내용 미리보기
+                            const contentPreview = journal.content
+                                .split('\n')
+                                .slice(0, 2)
+                                .join(' ')
+                                .trim();
+
+                            return (
+                                <JournalCard
+                                    key={journal.id}
+                                    date={formatDay(journal.created_at)}
+                                    dayOfWeek={formatDayOfWeek(journal.created_at)}
+                                    title={title}
+                                    content={contentPreview}
+                                    mood={journal.mood}
+                                    onClick={() => onJournalClick?.(journal)}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
             ))}

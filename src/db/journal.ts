@@ -7,7 +7,15 @@ export async function listJournalsByUser(
     limit?: number,
     offset?: number,
 ): Promise<Content[]> {
-    let query = supabase.from('contents').select('*').order('created_at', { ascending: false });
+    let query = supabase
+        .from('contents')
+        .select(
+            `
+            *,
+            questions(id, question)
+        `,
+        )
+        .order('created_at', { ascending: false });
 
     if (limit !== undefined) {
         const end = offset !== undefined ? offset + limit - 1 : limit - 1;
@@ -17,7 +25,11 @@ export async function listJournalsByUser(
     const { data, error } = await query;
     if (error) throw error;
 
-    return data ?? [];
+    // questions를 question으로 매핑
+    return (data ?? []).map((item: Record<string, unknown>) => ({
+        ...item,
+        question: item.questions,
+    })) as Content[];
 }
 
 // 특정 날짜의 일기들
@@ -51,19 +63,26 @@ export async function getJournalById(
         .from('contents')
         .select(
             `
-    *,
-    ai_comments(
-      id,
-      comment,
-      created_at
-    )
-  `,
+            *,
+            questions(id, question),
+            ai_comments(
+                id,
+                comment,
+                created_at
+            )
+        `,
         )
         .eq('id', id)
         .single();
 
     if (error) throw error;
-    return data;
+    if (!data) return null;
+
+    // questions를 question으로 매핑
+    return {
+        ...data,
+        question: data.questions,
+    } as Content;
 }
 
 // 오늘 작성했는지 여부
