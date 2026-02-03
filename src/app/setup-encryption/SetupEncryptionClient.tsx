@@ -102,7 +102,7 @@ export default function SetupEncryptionClient() {
             // // encryption_keys 테이블에 저장
             const { error: insertError } = await supabase.from('encryption_keys').insert({
                 user_id: user.id,
-                password_salt: passwordSalt,
+                password_salt: btoa(String.fromCharCode(...passwordSalt)),
                 encrypted_master_key: encryptedMasterKey,
                 verification_token: verificationToken,
             });

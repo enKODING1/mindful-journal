@@ -35,8 +35,6 @@ export async function proxy(req: NextRequest) {
         .select('*')
         .eq('user_id', user.id)
         .single();
-    console.log('encryption_key');
-    // console.log(encryption_key);
 
     if (!encryption_key) {
         return NextResponse.redirect(new URL('/setup-encryption', req.url));

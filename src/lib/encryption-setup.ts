@@ -34,7 +34,7 @@ export async function setupEncryption(password: string): Promise<void> {
     }
 
     const masterKeyBase64 = btoa(String.fromCharCode(...masterKey));
-    sessionStorage.setItem('masterKey', masterKeyBase64);
+    localStorage.setItem('masterKey', masterKeyBase64);
 
     masterKey.fill(0);
 
@@ -84,8 +84,8 @@ export async function verifyPasswordAndGetMasterKey(password: string): Promise<U
         console.log('마스터키 복호화 완료');
 
         const masterKeyBase64 = btoa(String.fromCharCode(...masterKey));
-        sessionStorage.setItem('masterKey', masterKeyBase64);
-        console.log('sessionStorage 저장 완료');
+        localStorage.setItem('masterKey', masterKeyBase64);
+        console.log('localStorage 저장 완료');
 
         console.log('비밀번호 검증 성공!');
         return masterKey;
@@ -96,10 +96,10 @@ export async function verifyPasswordAndGetMasterKey(password: string): Promise<U
 }
 
 /**
- * sessionStorage에서 마스터키 가져오기
+ * localStorage에서 마스터키 가져오기
  */
 export function getMasterKeyFromSession(): Uint8Array | null {
-    const keyBase64 = sessionStorage.getItem('masterKey');
+    const keyBase64 = localStorage.getItem('masterKey');
     if (!keyBase64) return null;
 
     return Uint8Array.from(atob(keyBase64), (c) => c.charCodeAt(0));

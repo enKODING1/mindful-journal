@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import Slider from '@/components/Slider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import { MasterKeyProvider } from '@/lib/useMasterKey';
 import './globals.css';
 
 const geistSans = Geist({
@@ -31,7 +32,7 @@ export default function RootLayout({
             >
                 <GoogleAnalytics />
                 <Slider />
-                {children}
+                <MasterKeyProvider>{children}</MasterKeyProvider>
             </body>
         </html>
     );
