@@ -1,38 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-    BookOpen,
-    ChartBar,
-    SlidersHorizontal,
-    Calendar,
-    LogOut,
-    Menu,
-    SquarePen,
-} from 'lucide-react';
-import createClient from '@/db/supabase/client';
+import { BookOpen, ChartBar, SlidersHorizontal, Calendar, Menu, SquarePen } from 'lucide-react';
 
 export default function Slider() {
-    const router = useRouter();
-    const supabase = createClient();
-    const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
-
-    useEffect(() => {
-        let isMounted = true;
-        supabase.auth.getUser().then(({ data }) => {
-            if (isMounted) setUser(data.user);
-        });
-        return () => {
-            isMounted = false;
-        };
-    }, [supabase]);
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        router.push('/login');
-    };
-
     return (
         <div className="drawer">
             <input id="my-drawer" type="checkbox" className="drawer-toggle" />
@@ -49,25 +19,7 @@ export default function Slider() {
                         </label>
                     </div>
 
-                    <div className="navbar-end">
-                        {user ? (
-                            <button
-                                onClick={handleLogout}
-                                className="btn btn-ghost hover:bg-error hover:text-error-content transition-colors"
-                            >
-                                <LogOut size={16} />
-                                <span className="ml-2">로그아웃</span>
-                            </button>
-                        ) : (
-                            <Link
-                                href="/login"
-                                className="btn btn-ghost hover:bg-primary hover:text-primary-content transition-colors"
-                            >
-                                <LogOut size={16} className="rotate-180" />
-                                <span className="ml-2">로그인</span>
-                            </Link>
-                        )}
-                    </div>
+                    <div className="navbar-end"></div>
                 </div>
             </div>
             <div className="drawer-side">
