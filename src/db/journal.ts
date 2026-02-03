@@ -38,20 +38,26 @@ export async function getJournalByDate(supabase: SupabaseClient, ymd: string): P
         .from('contents')
         .select(
             `
-    *,
-    ai_comments(
-      id,
-      comment,
-      created_at
-    )
-  `,
+            *,
+            questions(id, question),
+            ai_comments(
+                id,
+                comment,
+                created_at
+            )
+        `,
         )
         .gte('created_at', `${ymd}T00:00:00`)
         .lt('created_at', `${ymd}T23:59:59`)
         .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data ?? [];
+
+    // questions를 question으로 매핑
+    return (data ?? []).map((item: Record<string, unknown>) => ({
+        ...item,
+        question: item.questions,
+    })) as Content[];
 }
 
 // 특정 ID의 일기 가져오기
