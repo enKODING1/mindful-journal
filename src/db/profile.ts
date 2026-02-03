@@ -42,7 +42,7 @@ export async function ensureMyProfile(supabase: SupabaseClient): Promise<Profile
 // 프로필 업데이트(부분 업데이트)
 export async function updateMyProfile(
     supabase: SupabaseClient,
-    payload: Partial<Pick<Profile, 'alias' | 'email' | 'gender'>>,
+    payload: Partial<Pick<Profile, 'alias' | 'email' | 'avatar_url'>>,
 ): Promise<Profile> {
     const {
         data: { user },

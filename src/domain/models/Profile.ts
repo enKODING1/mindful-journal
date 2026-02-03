@@ -1,20 +1,19 @@
 export interface Profile {
     id: number;
     user_id: string;
-    alias: string;
-    email: string;
-    gender: string;
+    alias: string | null;
+    email: string | null;
+    avatar_url: string | null;
     created_at: string;
 }
 
 export interface ProfileFormData {
     alias: string;
     email: string;
-    bio?: string;
 }
 
 export interface ProfileUpdatePayload {
     alias?: string;
     email?: string;
-    updated_at?: string;
+    avatar_url?: string;
 }
