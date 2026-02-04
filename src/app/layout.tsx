@@ -1,18 +1,14 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Jua } from 'next/font/google';
 import Slider from '@/components/Slider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { MasterKeyProvider } from '@/lib/useMasterKey';
 import './globals.css';
 
-const geistSans = Geist({
-    variable: '--font-geist-sans',
+const jua = Jua({
+    variable: '--font-jua',
     subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-    variable: '--font-geist-mono',
-    subsets: ['latin'],
+    weight: '400',
 });
 
 export const metadata: Metadata = {
@@ -28,7 +24,7 @@ export default function RootLayout({
     return (
         <html lang="ko">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-300 min-h-screen`}
+                className={`${jua.variable} antialiased bg-base-300 min-h-screen font-[family-name:var(--font-jua)]`}
             >
                 <GoogleAnalytics />
                 <Slider />
