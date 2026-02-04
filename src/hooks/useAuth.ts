@@ -33,7 +33,6 @@ export function useAuth() {
         setError(undefined);
         try {
             await authService.signOut(supabase);
-            router.push('/(auth)');
             return true;
         } catch (err) {
             const message = err instanceof Error ? err.message : '로그아웃에 실패했습니다';

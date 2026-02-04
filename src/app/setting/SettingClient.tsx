@@ -3,14 +3,26 @@
 import Image from 'next/image';
 import Container from '@/components/ui/atom/Container';
 import type { Profile } from '@/domain/models';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SettingClientProps {
     profile: Profile;
 }
 
 export default function SettingClient({ profile }: SettingClientProps) {
+    const router = useRouter();
+    const { logout, error } = useAuth();
     // 기본 아바타 URL (없을 경우)
     const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.alias || 'User')}&background=random&size=128`;
+
+    const handleLogout = async () => {
+        await logout();
+        if (!error) {
+            localStorage.removeItem('masterKey');
+            router.push('/login');
+        }
+    };
 
     return (
         <Container className="mt-10" variant="base-300" padding="xl" gap="lg" rounded="2xl">
@@ -56,7 +68,7 @@ export default function SettingClient({ profile }: SettingClientProps) {
 
             {/* 계정 관련 */}
             <section className="flex flex-col gap-2">
-                <SettingItem label="로그아웃" variant="danger" />
+                <SettingItem label="로그아웃" variant="danger" onClick={handleLogout} />
             </section>
         </Container>
     );
