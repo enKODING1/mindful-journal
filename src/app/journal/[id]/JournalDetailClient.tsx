@@ -22,6 +22,8 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
     const [decryptedJournal, setDecryptedJournal] = useState<Content | null>(null);
     const [decryptError, setDecryptError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [responseError, setResponseError] = useState<boolean>(false);
+    const [responseErrorMessage, setResponseErrorMessage] = useState<string>('');
 
     const [aiLoading, setAiLoading] = useState(false);
 
@@ -46,11 +48,18 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
             const response = await fetch('/api/gemini', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: decryptedJournal.decryptedContent }),
+                body: JSON.stringify({
+                    prompt: decryptedJournal.decryptedContent,
+                    mood: decryptedJournal.mood,
+                }),
             });
             const data = await response.json();
             const aiResponseText = data.text;
-
+            if (data.error) {
+                setResponseError(true);
+                setResponseErrorMessage(data.error);
+                return;
+            }
             // 3. AI 응답 암호화
             const encryptedComment = await encryptText(aiResponseText, cryptoKey);
 
@@ -182,7 +191,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
             </Container>
         );
     }
-
+    console.log(responseErrorMessage);
     return (
         <div className="mt-10">
             <JournalDetailView journal={decryptedJournal} onBack={handleBack} />
@@ -192,7 +201,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                         className="btn btn-primary"
                         onClick={handleGetAiResponse}
                         disabled={aiLoading}
-                        style={{ marginBottom: '16rem' }}
+                        // style={{ marginBottom: '16rem' }}
                     >
                         {aiLoading ? (
                             <div>
@@ -203,8 +212,10 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                             '이야기 나누기'
                         )}
                     </button>
+                    {responseError && <p className="text-error mt-4">{responseErrorMessage}</p>}
                 </div>
             )}
+            <div className="mb-20"></div>
         </div>
     );
 }
