@@ -1,7 +1,16 @@
 import { createMiddlewareClient } from '@/db/supabase/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 
-const protectedPaths = ['/', '/journal', '/moodCalendar', '/stat', '/write'];
+const protectedPaths = [
+    '/',
+    '/journal',
+    '/moodCalendar',
+    '/stat',
+    '/write',
+    '/setting',
+    '/setup-encryption',
+    '/unlock',
+];
 const publicPaths = ['/login', '/auth/callback'];
 
 export async function proxy(req: NextRequest) {
