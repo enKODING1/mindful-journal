@@ -24,7 +24,12 @@ export async function getJournalById(
 
 export async function createJournal(
     supabase: SupabaseClient,
-    input: { content: string; mood: Mood; questionId?: number; date?: string },
+    input: {
+        content: { iv: string; data: string };
+        mood: Mood;
+        questionId?: number;
+        date?: string;
+    },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
     // Get current user
     const {
@@ -35,7 +40,7 @@ export async function createJournal(
         throw new Error('로그인이 필요합니다');
     }
 
-    if (!input.content.trim()) {
+    if (!input.content) {
         throw new Error('일기 내용을 입력해주세요');
     }
 

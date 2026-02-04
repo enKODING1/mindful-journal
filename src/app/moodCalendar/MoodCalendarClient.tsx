@@ -21,17 +21,16 @@ interface MoodCalendarClientProps {
  * 일기 내용 복호화
  */
 async function decryptJournalContent(
-    encryptedContent: string,
+    encryptedContent: { iv: string; data: string },
     cryptoKey: CryptoKey,
 ): Promise<string> {
     try {
-        const parsed = JSON.parse(encryptedContent);
-        if (parsed.iv && parsed.data) {
-            return await decryptText(parsed, cryptoKey);
+        if (encryptedContent.iv && encryptedContent.data) {
+            return await decryptText(encryptedContent, cryptoKey);
         }
-        return encryptedContent;
+        return '[복호화 실패]';
     } catch {
-        return encryptedContent;
+        return '[복호화 실패]';
     }
 }
 
@@ -80,7 +79,7 @@ export default function MoodCalendarClient({
             const decrypted = await Promise.all(
                 journals.map(async (journal) => ({
                     ...journal,
-                    content: await decryptJournalContent(journal.content, cryptoKey),
+                    decryptedContent: await decryptJournalContent(journal.content, cryptoKey),
                 })),
             );
             setDecryptedJournals(decrypted);
@@ -123,13 +122,15 @@ export default function MoodCalendarClient({
         router.push(`/journal/${journal.id}`);
     };
 
-    // 제목과 미리보기 추출
+    // 제목과 미리보기 추출 (복호화된 내용 사용)
     const getTitle = (journal: Content) => {
-        return journal.question?.question || journal.content.split('\n')[0] || '제목 없음';
+        const content = journal.decryptedContent ?? '';
+        return journal.question?.question || content.split('\n')[0] || '제목 없음';
     };
 
     const getContentPreview = (journal: Content) => {
-        return journal.content.split('\n').slice(0, 2).join(' ').trim();
+        const content = journal.decryptedContent ?? '';
+        return content.split('\n').slice(0, 2).join(' ').trim();
     };
 
     return (

@@ -72,7 +72,7 @@ export function useJournals() {
 
     // 일기 생성
     const createJournal = useCallback(
-        async (content: string, mood: Mood) => {
+        async (content: { iv: string; data: string }, mood: Mood) => {
             setLoading(true);
             setError(null);
             try {

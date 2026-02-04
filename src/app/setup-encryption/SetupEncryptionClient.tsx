@@ -86,7 +86,6 @@ export default function SetupEncryptionClient() {
 
             console.log('마스터키 생성...');
             const masterKey = generateMasterKey();
-
             console.log('비밀번호 솔트 생성...');
             const passwordSalt = crypto.getRandomValues(new Uint8Array(16));
 
@@ -112,6 +111,11 @@ export default function SetupEncryptionClient() {
                 setLoading(false);
                 return;
             }
+
+            // localStorage에 마스터키 저장
+
+            const masterKeyBase64 = btoa(String.fromCharCode(...masterKey));
+            localStorage.setItem('masterKey', masterKeyBase64);
 
             // 성공 시 Step 4로 이동
             setStep(4);

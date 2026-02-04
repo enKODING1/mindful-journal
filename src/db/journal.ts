@@ -112,7 +112,13 @@ export async function hasWrittenToday(
 // 일기 생성
 export async function createJournal(
     supabase: SupabaseClient,
-    input: { userId: string; content: string; mood: Mood; questionId?: number; date?: string },
+    input: {
+        userId: string;
+        content: { iv: string; data: string };
+        mood: Mood;
+        questionId?: number;
+        date?: string;
+    },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
     const { data, error } = await supabase
         .from('contents')

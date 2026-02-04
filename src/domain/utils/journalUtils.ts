@@ -92,7 +92,10 @@ export function calculateLongestStreak(contents: Content[]): number {
 export function calculateAvgWordCount(contents: Content[]): number {
     if (contents.length === 0) return 0;
 
-    const totalChars = contents.reduce((sum, content) => sum + content.content.length, 0);
+    const totalChars = contents.reduce(
+        (sum, content) => sum + (content.decryptedContent?.length ?? 0),
+        0,
+    );
     return Math.round(totalChars / contents.length);
 }
 

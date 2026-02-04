@@ -42,22 +42,22 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                     ['decrypt'],
                 );
 
-                let decryptedContent = journal.content;
+                let decryptedContent: string;
 
                 try {
-                    // JSON 형식인 경우 파싱 시도
-                    const parsed = JSON.parse(journal.content);
-                    if (parsed.iv && parsed.data) {
-                        decryptedContent = await decryptText(parsed, cryptoKey);
+                    // content가 이미 EncryptedContent 객체
+                    if (journal.content.iv && journal.content.data) {
+                        decryptedContent = await decryptText(journal.content, cryptoKey);
+                    } else {
+                        decryptedContent = '[복호화 실패]';
                     }
                 } catch {
-                    // JSON 파싱 실패 = 이미 평문이거나 다른 형식
-                    // 그대로 사용
+                    decryptedContent = '[복호화 실패]';
                 }
 
                 setDecryptedJournal({
                     ...journal,
-                    content: decryptedContent,
+                    decryptedContent,
                 });
             } catch (err) {
                 console.error('Decryption failed:', err);

@@ -21,12 +21,12 @@ const formatFullDate = (dateString: string): string => {
 };
 
 export default function JournalDetailView({ journal, onBack }: JournalDetailViewProps) {
+    // 복호화된 내용 사용 (없으면 빈 문자열)
+    const content = journal.decryptedContent ?? '';
     // 질문이 있으면 질문을, 없으면 내용의 첫 줄을 제목으로
-    const title = journal.question?.question || journal.content.split('\n')[0] || '';
+    const title = journal.question?.question || content.split('\n')[0] || '';
     // 제목으로 사용한 첫 줄을 제외한 나머지 내용
-    const bodyContent = journal.question
-        ? journal.content
-        : journal.content.split('\n').slice(1).join('\n').trim();
+    const bodyContent = journal.question ? content : content.split('\n').slice(1).join('\n').trim();
 
     return (
         <article className="max-w-2xl mx-auto px-4 py-8">
@@ -65,7 +65,7 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
             {/* 본문 */}
             <section className="prose prose-lg max-w-none">
                 <p className="text-base-content/80 leading-relaxed whitespace-pre-wrap text-[17px]">
-                    {bodyContent || journal.content}
+                    {bodyContent || content}
                 </p>
             </section>
 

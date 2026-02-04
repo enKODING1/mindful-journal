@@ -50,7 +50,7 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        content: JSON.stringify(encryptedContent),
+                        content: encryptedContent,
                         mood,
                         questionId: question?.id,
                     }),

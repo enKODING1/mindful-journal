@@ -2,10 +2,13 @@ import { Mood } from './Mood';
 import { Comment } from './Comment';
 import { Question } from './Question';
 
+export type EncryptedContent = { iv: string; data: string };
+
 export interface Content {
     id: string;
     created_at: string;
-    content: string;
+    content: EncryptedContent;
+    decryptedContent?: string;
     mood: Mood;
     question_id?: number;
     question?: Question;

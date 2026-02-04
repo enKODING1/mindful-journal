@@ -77,17 +77,13 @@ export default function JournalList({ journals, onJournalClick }: JournalListPro
                     {/* 해당 월의 일기 목록 */}
                     <div className="flex flex-col gap-3">
                         {group.journals.map((journal) => {
+                            // 복호화된 내용 사용 (없으면 빈 문자열)
+                            const content = journal.decryptedContent ?? '';
                             // 질문이 있으면 질문을 제목으로, 없으면 첫 줄을 제목으로
                             const title =
-                                journal.question?.question ||
-                                journal.content.split('\n')[0] ||
-                                '제목 없음';
+                                journal.question?.question || content.split('\n')[0] || '제목 없음';
                             // 내용 미리보기
-                            const contentPreview = journal.content
-                                .split('\n')
-                                .slice(0, 2)
-                                .join(' ')
-                                .trim();
+                            const contentPreview = content.split('\n').slice(0, 2).join(' ').trim();
 
                             return (
                                 <JournalCard

@@ -12,7 +12,7 @@ export async function POST(req: Request) {
         }
         const supabase = await createClient();
         const result = await journalService.createJournal(supabase, {
-            content: content,
+            content,
             mood,
             questionId,
             date: getToday(),

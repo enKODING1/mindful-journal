@@ -33,22 +33,16 @@ export function useJournals() {
  * 일기 내용 복호화
  */
 async function decryptJournalContent(
-    encryptedContent: string,
+    encryptedContent: { iv: string; data: string },
     cryptoKey: CryptoKey,
 ): Promise<string> {
     try {
-        // JSON 형식인 경우 파싱 시도
-        const parsed = JSON.parse(encryptedContent);
-        if (parsed.iv && parsed.data) {
-            return await decryptText(parsed, cryptoKey);
+        if (encryptedContent.iv && encryptedContent.data) {
+            return await decryptText(encryptedContent, cryptoKey);
         }
-        // 이미 평문인 경우 그대로 반환
-        return encryptedContent;
+        return '[복호화 실패]';
     } catch {
-        // JSON 파싱 실패 = 평문이거나 다른 형식
-        // data만 있는 경우 (WriteClient에서 encryptedContent.data만 저장한 경우)
-        // 이 경우 iv가 없어서 복호화 불가능 - 일단 그대로 반환
-        return encryptedContent;
+        return '[복호화 실패]';
     }
 }
 
@@ -59,7 +53,7 @@ async function decryptJournals(journals: Content[], cryptoKey: CryptoKey): Promi
     return Promise.all(
         journals.map(async (journal) => ({
             ...journal,
-            content: await decryptJournalContent(journal.content, cryptoKey),
+            decryptedContent: await decryptJournalContent(journal.content, cryptoKey),
         })),
     );
 }
@@ -158,9 +152,9 @@ export function JournalProvider({
             try {
                 const journal = await journalService.getJournalById(supabase, id);
                 if (journal) {
-                    const decrypted = {
+                    const decrypted: Content = {
                         ...journal,
-                        content: await decryptJournalContent(journal.content, cryptoKey),
+                        decryptedContent: await decryptJournalContent(journal.content, cryptoKey),
                     };
                     // 캐시에 추가
                     setJournals((prev) => {
