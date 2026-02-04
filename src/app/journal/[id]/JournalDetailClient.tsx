@@ -9,6 +9,7 @@ import { decryptText, encryptText } from '@/lib/crypto';
 import { getMasterKey } from '@/lib/useMasterKey';
 import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
+import Loading from '@/components/ui/atom/Loading';
 
 interface JournalDetailClientProps {
     journal: Content | null;
@@ -191,8 +192,16 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                         className="btn btn-primary"
                         onClick={handleGetAiResponse}
                         disabled={aiLoading}
+                        style={{ marginBottom: '16rem' }}
                     >
-                        {aiLoading ? '생성 중...' : '따뜻한 위로 받기'}
+                        {aiLoading ? (
+                            <div>
+                                한마디 적고 있어요...
+                                <Loading size="sm" />
+                            </div>
+                        ) : (
+                            '이야기 나누기'
+                        )}
                     </button>
                 </div>
             )}

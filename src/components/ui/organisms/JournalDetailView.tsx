@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Button from '../atom/Button';
 import { getMoodImage, getMoodLabel } from '@/domain/models';
 import type { Content } from '@/domain/models';
+import { Mail } from 'lucide-react';
 
 export interface JournalDetailViewProps {
     journal: Content;
@@ -73,9 +74,9 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
             {journal.ai_comments && journal.ai_comments.length > 0 && (
                 <aside className="mt-16 pt-8 border-t border-base-200">
                     <div className="flex items-center gap-2 mb-4">
-                        <span className="text-base-content/40">🤖</span>
+                        <Mail size={16} />
                         <span className="text-xs uppercase tracking-wide text-base-content/40 font-medium">
-                            마음챙김봇의 생각
+                            나누고 싶은 말
                         </span>
                     </div>
                     {journal.ai_comments.map((comment) => (
