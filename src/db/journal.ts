@@ -136,19 +136,29 @@ export async function createJournal(
     return data!;
 }
 
-// 댓글 추가
-export async function addComment(
+// AI 댓글 추가
+export async function addAIComment(
     supabase: SupabaseClient,
-    input: { contentId: string; body: string; userId: string; type?: 'AI' | 'USER' },
-): Promise<void> {
-    const { error } = await supabase.from('ai_comments').insert({
-        content_id: input.contentId,
-        comment: input.body,
-        user_id: input.userId,
-        comment_type: input.type ?? 'USER',
-    });
+    input: {
+        contentId: string;
+        comment: { iv: string; data: string };
+        userId: string;
+        modelVersion?: string;
+    },
+): Promise<{ id: number; created_at: string }> {
+    const { data, error } = await supabase
+        .from('ai_comments')
+        .insert({
+            content_id: input.contentId,
+            comment: input.comment,
+            user_id: input.userId,
+            model_version: input.modelVersion,
+        })
+        .select('id, created_at')
+        .single();
 
     if (error) throw error;
+    return data!;
 }
 
 // 사용자별 일기 전체 개수

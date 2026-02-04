@@ -1,5 +1,5 @@
 import { Mood } from './Mood';
-import { Comment } from './Comment';
+import { AIComment } from './Comment';
 import { Question } from './Question';
 
 export type EncryptedContent = { iv: string; data: string };
@@ -12,7 +12,7 @@ export interface Content {
     mood: Mood;
     question_id?: number;
     question?: Question;
-    comments?: Comment[];
+    ai_comments?: AIComment[];
 }
 
 export type ContentsByMood = Record<Mood, Content[]>;

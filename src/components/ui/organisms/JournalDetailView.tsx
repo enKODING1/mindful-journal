@@ -70,7 +70,7 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
             </section>
 
             {/* AI 피드백 */}
-            {journal.comments && journal.comments.length > 0 && (
+            {journal.ai_comments && journal.ai_comments.length > 0 && (
                 <aside className="mt-16 pt-8 border-t border-base-200">
                     <div className="flex items-center gap-2 mb-4">
                         <span className="text-base-content/40">🤖</span>
@@ -78,12 +78,12 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
                             마음챙김봇의 생각
                         </span>
                     </div>
-                    {journal.comments.map((comment) => (
+                    {journal.ai_comments.map((comment) => (
                         <p
                             key={comment.id}
                             className="text-base-content/60 leading-relaxed whitespace-pre-wrap text-[15px]"
                         >
-                            {comment.comment}
+                            {comment.decryptedComment}
                         </p>
                     ))}
                 </aside>

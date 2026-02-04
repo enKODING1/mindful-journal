@@ -65,10 +65,14 @@ export async function getNextQuestion(supabase: SupabaseClient): Promise<Questio
     return JournalRepo.getNextQuestion(supabase);
 }
 
-export async function addComment(
+export async function addAIComment(
     supabase: SupabaseClient,
-    input: { contentId: string; body: string; type?: 'AI' | 'USER' },
-): Promise<void> {
+    input: {
+        contentId: string;
+        comment: { iv: string; data: string };
+        modelVersion?: string;
+    },
+): Promise<{ id: number; created_at: string }> {
     const {
         data: { user },
     } = await supabase.auth.getUser();
@@ -77,10 +81,10 @@ export async function addComment(
         throw new Error('로그인이 필요합니다');
     }
 
-    return JournalRepo.addComment(supabase, {
+    return JournalRepo.addAIComment(supabase, {
         contentId: input.contentId,
-        body: input.body,
+        comment: input.comment,
         userId: user.id,
-        type: input.type,
+        modelVersion: input.modelVersion,
     });
 }

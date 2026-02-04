@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import JournalDetailView from '@/components/ui/organisms/JournalDetailView';
 import Container from '@/components/ui/atom/Container';
-import type { Content } from '@/domain/models';
-import { decryptText } from '@/lib/crypto';
+import type { Content, AIComment } from '@/domain/models';
+import { decryptText, encryptText } from '@/lib/crypto';
 import { getMasterKey } from '@/lib/useMasterKey';
+import createClient from '@/db/supabase/client';
+import * as journalService from '@/services/journalService';
 
 interface JournalDetailClientProps {
     journal: Content | null;
@@ -15,9 +17,70 @@ interface JournalDetailClientProps {
 
 export default function JournalDetailClient({ journal, error }: JournalDetailClientProps) {
     const router = useRouter();
+    const supabase = useMemo(() => createClient(), []);
     const [decryptedJournal, setDecryptedJournal] = useState<Content | null>(null);
     const [decryptError, setDecryptError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const [aiLoading, setAiLoading] = useState(false);
+
+    const handleGetAiResponse = async () => {
+        if (!decryptedJournal) return;
+        setAiLoading(true);
+        try {
+            // 1. 마스터키로 CryptoKey 생성 (암호화용)
+            const masterKey = getMasterKey();
+            if (!masterKey) {
+                throw new Error('암호화 키가 없습니다.');
+            }
+            const cryptoKey = await crypto.subtle.importKey(
+                'raw',
+                masterKey as BufferSource,
+                { name: 'AES-GCM' },
+                false,
+                ['encrypt', 'decrypt'],
+            );
+
+            // 2. Gemini API 호출 (복호화된 일기 내용만 전송)
+            const response = await fetch('/api/gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: decryptedJournal.decryptedContent }),
+            });
+            const data = await response.json();
+            const aiResponseText = data.text;
+
+            // 3. AI 응답 암호화
+            const encryptedComment = await encryptText(aiResponseText, cryptoKey);
+
+            // 4. DB에 저장
+            const savedComment = await journalService.addAIComment(supabase, {
+                contentId: decryptedJournal.id,
+                comment: encryptedComment,
+                modelVersion: 'gemini-2.0-flash',
+            });
+
+            // 5. 상태 업데이트 (복호화된 코멘트 포함)
+            const newAIComment: AIComment = {
+                id: savedComment.id,
+                content_id: decryptedJournal.id,
+                user_id: '',
+                comment: encryptedComment,
+                decryptedComment: aiResponseText,
+                created_at: savedComment.created_at,
+                model_version: 'gemini-2.0-flash',
+            };
+
+            setDecryptedJournal((prev) => ({
+                ...prev!,
+                ai_comments: [...(prev?.ai_comments || []), newAIComment],
+            }));
+        } catch (error) {
+            console.error('AI 코멘트 생성 실패:', error);
+        } finally {
+            setAiLoading(false);
+        }
+    };
 
     useEffect(() => {
         const decryptContent = async () => {
@@ -55,9 +118,28 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                     decryptedContent = '[복호화 실패]';
                 }
 
+                // ai_comments 복호화
+                let decryptedAIComments: AIComment[] = [];
+                if (journal.ai_comments && journal.ai_comments.length > 0) {
+                    decryptedAIComments = await Promise.all(
+                        journal.ai_comments.map(async (comment) => {
+                            try {
+                                const decryptedComment = await decryptText(
+                                    comment.comment,
+                                    cryptoKey,
+                                );
+                                return { ...comment, decryptedComment };
+                            } catch {
+                                return { ...comment, decryptedComment: '[복호화 실패]' };
+                            }
+                        }),
+                    );
+                }
+
                 setDecryptedJournal({
                     ...journal,
                     decryptedContent,
+                    ai_comments: decryptedAIComments,
                 });
             } catch (err) {
                 console.error('Decryption failed:', err);
@@ -103,6 +185,17 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
     return (
         <div className="mt-10">
             <JournalDetailView journal={decryptedJournal} onBack={handleBack} />
+            {(!decryptedJournal.ai_comments || decryptedJournal.ai_comments.length === 0) && (
+                <div className="max-w-2xl mx-auto px-4 mt-8">
+                    <button
+                        className="btn btn-primary"
+                        onClick={handleGetAiResponse}
+                        disabled={aiLoading}
+                    >
+                        {aiLoading ? '생성 중...' : '따뜻한 위로 받기'}
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
