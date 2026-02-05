@@ -7,12 +7,14 @@ import Button from '@/components/ui/atom/Button';
 import { Lock, Eye, EyeOff, KeyRound } from 'lucide-react';
 import createClient from '@/db/supabase/client';
 import { deriveKey, decrypt, decryptText } from '@/lib/crypto';
+import { getMyProfile } from '@/services/profileService';
 
 export default function UnlockClient() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [userName, setUserName] = useState<string | null>(null);
     const router = useRouter();
     const supabase = createClient();
 
@@ -22,6 +24,11 @@ export default function UnlockClient() {
         if (masterKey) {
             router.replace('/');
         }
+
+        (async () => {
+            const { alias } = await getMyProfile(supabase);
+            setUserName(alias);
+        })();
     }, [router]);
 
     const handleUnlock = async () => {
@@ -181,7 +188,8 @@ export default function UnlockClient() {
                 <p className="text-center text-sm text-base-content/50">
                     비밀번호를 잊으셨나요?
                     <br />
-                    안타깝게도 비밀번호를 복구할 수 없습니다.
+                    <strong>{userName ? userName : '사용자'}</strong>님만 볼 수 있도록 만들었기에
+                    복구할 수 없습어요 😢
                 </p>
             </Container>
         </div>
