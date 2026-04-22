@@ -3,7 +3,7 @@ import { deriveKey, encrypt, decrypt, encryptText, decryptText, generateMasterKe
 
 describe('crypto', () => {
     describe('generateMasterKey', () => {
-        it('32바이트(256비트) 마스터키를 생성해야 함', () => {
+        it('32바이트(256비트) DEK를 생성해야 함', () => {
             const key = generateMasterKey();
             expect(key).toBeInstanceOf(Uint8Array);
             expect(key.length).toBe(32);
@@ -166,8 +166,8 @@ describe('crypto', () => {
     });
 
     describe('전체 플로우 테스트', () => {
-        it('마스터키 생성 → 암호화 → 복호화 플로우가 동작해야 함', async () => {
-            // 1. 마스터키 생성
+        it('DEK 생성 → 암호화 → 복호화 플로우가 동작해야 함', async () => {
+            // 1. DEK 생성
             const masterKey = generateMasterKey();
 
             // 2. 비밀번호로 키 생성
@@ -175,10 +175,10 @@ describe('crypto', () => {
             const salt = crypto.getRandomValues(new Uint8Array(16));
             const passwordKey = await deriveKey(password, salt);
 
-            // 3. 마스터키 암호화
+            // 3. DEK 암호화
             const encryptedMasterKey = await encrypt(masterKey, passwordKey);
 
-            // 4. 마스터키 복호화
+            // 4. DEK 복호화
             const decryptedMasterKey = await decrypt(encryptedMasterKey, passwordKey);
 
             expect(decryptedMasterKey).toEqual(masterKey);
@@ -193,10 +193,10 @@ describe('crypto', () => {
             const oldSalt = crypto.getRandomValues(new Uint8Array(16));
             const oldPasswordKey = await deriveKey(oldPassword, oldSalt);
 
-            // 2. 마스터키와 일기 암호화
+            // 2. DEK와 일기 암호화
             const encryptedMasterKey = await encrypt(masterKey, oldPasswordKey);
 
-            // 마스터키를 CryptoKey로 변환
+            // DEK를 CryptoKey로 변환
             const masterCryptoKey = await crypto.subtle.importKey(
                 'raw',
                 masterKey as BufferSource,
@@ -211,11 +211,11 @@ describe('crypto', () => {
             const newSalt = crypto.getRandomValues(new Uint8Array(16));
             const newPasswordKey = await deriveKey(newPassword, newSalt);
 
-            // 기존 마스터키 복호화 후 새 비밀번호로 재암호화
+            // 기존 DEK 복호화 후 새 비밀번호로 재암호화
             const decryptedMasterKey = await decrypt(encryptedMasterKey, oldPasswordKey);
             const reEncryptedMasterKey = await encrypt(decryptedMasterKey, newPasswordKey);
 
-            // 4. 새 비밀번호로 마스터키 복호화 확인
+            // 4. 새 비밀번호로 DEK 복호화 확인
             const finalMasterKey = await decrypt(reEncryptedMasterKey, newPasswordKey);
             expect(finalMasterKey).toEqual(masterKey);
 

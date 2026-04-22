@@ -78,7 +78,7 @@ export function JournalProvider({
 
     const supabase = createClient();
 
-    // 마스터키 → CryptoKey 변환
+    // DEK → CryptoKey 변환
     useEffect(() => {
         const initCryptoKey = async () => {
             const masterKey = getMasterKey();

@@ -3,7 +3,7 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-// 마스터키 체크가 필요 없는 경로들
+// DEK 체크가 필요 없는 경로들
 const PUBLIC_PATHS = ['/login', '/setup-encryption', '/unlock'];
 
 interface MasterKeyContextType {
@@ -65,7 +65,7 @@ export function MasterKeyProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * localStorage에서 마스터키 가져오기
+ * localStorage에서 DEK 가져오기
  */
 export function getMasterKey(): Uint8Array | null {
     if (typeof window === 'undefined') return null;

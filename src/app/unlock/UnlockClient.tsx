@@ -18,7 +18,7 @@ export default function UnlockClient() {
     const router = useRouter();
     const supabase = createClient();
 
-    // 이미 마스터키가 있으면 홈으로 이동
+    // 이미 DEK가 있으면 홈으로 이동
     useEffect(() => {
         const masterKey = localStorage.getItem('masterKey');
         if (masterKey) {
@@ -87,11 +87,11 @@ export default function UnlockClient() {
                 return;
             }
 
-            // 6. 마스터키 복호화
+            // 6. DEK 복호화
             try {
                 const masterKey = await decrypt(encData.encrypted_master_key, passwordKey);
 
-                // 7. localStorage에 마스터키 저장
+                // 7. localStorage에 DEK 저장
                 const masterKeyBase64 = btoa(String.fromCharCode(...masterKey));
                 localStorage.setItem('masterKey', masterKeyBase64);
 

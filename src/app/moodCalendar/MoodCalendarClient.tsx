@@ -45,7 +45,7 @@ export default function MoodCalendarClient({
     const [cryptoKey, setCryptoKey] = useState<CryptoKey | null>(null);
     const supabase = useMemo(() => createClient(), []);
 
-    // 마스터키 → CryptoKey 변환
+    // DEK → CryptoKey 변환
     useEffect(() => {
         const initCryptoKey = async () => {
             const masterKey = getMasterKey();

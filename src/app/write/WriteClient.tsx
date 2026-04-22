@@ -27,13 +27,13 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
             setLoading(true);
             setError(null);
             try {
-                // 1. localStorage에서 마스터키 가져오기
+                // 1. localStorage에서 DEK 가져오기
                 const masterKey = getMasterKey();
                 if (!masterKey) {
                     throw new Error('암호화 키가 없습니다. 다시 로그인해주세요.');
                 }
 
-                // 2. 마스터키를 CryptoKey로 변환
+                // 2. DEK를 CryptoKey로 변환
                 const cryptoKey = await crypto.subtle.importKey(
                     'raw',
                     masterKey as BufferSource,

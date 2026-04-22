@@ -84,7 +84,7 @@ export default function SetupEncryptionClient() {
                 return;
             }
 
-            console.log('마스터키 생성...');
+            console.log('DEK 생성...');
             const masterKey = generateMasterKey();
             console.log('비밀번호 솔트 생성...');
             const passwordSalt = crypto.getRandomValues(new Uint8Array(16));
@@ -92,7 +92,7 @@ export default function SetupEncryptionClient() {
             console.log('비밀번호 키 생성...');
             const passwordKey = await deriveKey(password, passwordSalt);
 
-            console.log('마스터키 암호화...');
+            console.log('DEK 암호화...');
             const encryptedMasterKey = await encrypt(masterKey, passwordKey);
 
             console.log('검증 토큰 생성...');
@@ -112,7 +112,7 @@ export default function SetupEncryptionClient() {
                 return;
             }
 
-            // localStorage에 마스터키 저장
+            // localStorage에 DEK 저장
 
             const masterKeyBase64 = btoa(String.fromCharCode(...masterKey));
             localStorage.setItem('masterKey', masterKeyBase64);

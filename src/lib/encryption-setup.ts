@@ -42,7 +42,7 @@ export async function setupEncryption(password: string): Promise<void> {
 }
 
 /**
- * 비밀번호 검증 및 마스터키 복호화 (기존 사용자)
+ * 비밀번호 검증 및 DEK 복호화 (기존 사용자)
  */
 export async function verifyPasswordAndGetMasterKey(password: string): Promise<Uint8Array | null> {
     const supabase = createClientComponentClient();
@@ -81,7 +81,7 @@ export async function verifyPasswordAndGetMasterKey(password: string): Promise<U
     try {
         const masterKey = await decrypt(encData.encrypted_master_key, passwordKey);
 
-        console.log('마스터키 복호화 완료');
+        console.log('DEK 복호화 완료');
 
         const masterKeyBase64 = btoa(String.fromCharCode(...masterKey));
         localStorage.setItem('masterKey', masterKeyBase64);
@@ -90,13 +90,13 @@ export async function verifyPasswordAndGetMasterKey(password: string): Promise<U
         console.log('비밀번호 검증 성공!');
         return masterKey;
     } catch (error) {
-        console.error('마스터키 복호화 실패:', error);
+        console.error('DEK 복호화 실패:', error);
         return null;
     }
 }
 
 /**
- * localStorage에서 마스터키 가져오기
+ * localStorage에서 DEK 가져오기
  */
 export function getMasterKeyFromSession(): Uint8Array | null {
     const keyBase64 = localStorage.getItem('masterKey');
@@ -106,7 +106,7 @@ export function getMasterKeyFromSession(): Uint8Array | null {
 }
 
 /**
- * 마스터키로 일기 암호화
+ * DEK로 일기 암호화
  */
 export async function encryptDiary(content: string): Promise<{ iv: string; data: string }> {
     const masterKey = getMasterKeyFromSession();
@@ -114,7 +114,7 @@ export async function encryptDiary(content: string): Promise<{ iv: string; data:
         throw new Error('마스터키가 없습니다');
     }
 
-    // 마스터키를 CryptoKey로 변환
+    // DEK를 CryptoKey로 변환
     const key = await crypto.subtle.importKey(
         'raw',
         masterKey as BufferSource,
@@ -127,7 +127,7 @@ export async function encryptDiary(content: string): Promise<{ iv: string; data:
 }
 
 /**
- * 마스터키로 일기 복호화
+ * DEK로 일기 복호화
  */
 export async function decryptDiary(encrypted: { iv: string; data: string }): Promise<string> {
     const masterKey = getMasterKeyFromSession();
@@ -135,7 +135,7 @@ export async function decryptDiary(encrypted: { iv: string; data: string }): Pro
         throw new Error('마스터키가 없습니다');
     }
 
-    // 마스터키를 CryptoKey로 변환
+    // DEK를 CryptoKey로 변환
     const key = await crypto.subtle.importKey(
         'raw',
         masterKey as BufferSource,

@@ -31,7 +31,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
         if (!decryptedJournal) return;
         setAiLoading(true);
         try {
-            // 1. 마스터키로 CryptoKey 생성 (암호화용)
+            // 1. DEK로 CryptoKey 생성 (암호화용)
             const masterKey = getMasterKey();
             if (!masterKey) {
                 throw new Error('암호화 키가 없습니다.');
