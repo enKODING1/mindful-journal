@@ -1,14 +1,32 @@
 # 마음챙김일기
 
-매일의 감정과 생각을 기록하고 돌아보는 마음챙김 일기 앱입니다.
+서버 관리자도 읽을 수 없는 종단간 암호화 기반 감정 일기 앱.
+<img width="350" alt="mindful-journal" src="./docs/mindful-journal.gif" />
+<br>
 
-## 주요 기능
+### 기능
 
-- **일기 작성** - AI 질문을 통한 가이드 일기 작성
-- **일기 목록** - 작성한 일기 목록 조회 및 무한 스크롤
-- **통계** - 일기 작성 패턴 및 감정 분석 통계
-- **기분 캘린더** - 날짜별 기분 변화 시각화
-- **암호화** - 종단간 암호화로 작성 외 열람 불가
+- **가이드 질문 일기 작성** — 질문으로 글쓰기 유도
+- **AI 공감 한마디** — 복호화된 본문을 Gemini로 전송, 응답도 암호화하여 저장
+- **감정 통계** — 연속 기록, 평균 글자수, 감정 분포, 월별 추이
+- **기분 캘린더** — 날짜별 기분 시각화
+
+## 주요 특징
+
+### 아키텍처
+
+<img width="780" alt="아키텍처" src="./docs/project-architecture.png" /><br>
+
+- **3-Layer** — Domain / Service / Repository 분리로 암호화 책임 경계 명확화
+- **Atomic Design** — atom / molecule / organism UI 구조
+
+### 보안 / 암호화
+
+<img width="780" alt="e2ee-small" src="./docs/e2ee-small-architecture.png" /><br>
+<a href="./docs/e2ee-architecture.png"> 세부 다이어그램 보기</a>
+
+- **종단간 암호화 (E2EE)** — 일기 본문이 서버로 전송되기 전 브라우저에서 암호화, DB에는 암호문만 저장
+- **DEK/KEK 엔벨로프 구조** — 비밀번호(KEK)로 실제 암호화 키(DEK)를 감싸 보관 → 비밀번호 변경 시 전체 데이터 재암호화 불필요
 
 ## 기술 스택
 
