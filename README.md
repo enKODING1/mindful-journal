@@ -1,6 +1,6 @@
 # 마음챙김일기
 
-서버 관리자도 읽을 수 없는 종단간 암호화 기반 감정 일기 앱.
+서버 관리자도 읽을 수 없는 종단간 암호화 기반 감정 일기 앱. <br>
 <img width="350" alt="mindful-journal" src="./docs/mindful-journal.gif" />
 <br>
 
