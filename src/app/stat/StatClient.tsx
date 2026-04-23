@@ -1,12 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PeriodTab from '@/components/ui/molecules/PeriodTab';
 import Container from '@/components/ui/atom/Container';
 import JournalStats, { JournalStatsData } from '@/components/ui/organisms/JournalStats';
 import MoodDistribution from '@/components/ui/organisms/MoodDistribution';
 import MonthlyTrend from '@/components/ui/organisms/MonthlyTrend';
 import { Content } from '@/domain/models';
+import { decryptText } from '@/lib/crypto';
+import { getMasterKey } from '@/lib/useMasterKey';
 import {
     calculateCurrentStreak,
     calculateLongestStreak,
@@ -22,14 +24,47 @@ interface StatClientProps {
 
 export default function StatClient({ initialJournals }: StatClientProps) {
     const [period, setPeriod] = useState<'week' | 'month' | 'year'>('week');
+    const [decryptedJournals, setDecryptedJournals] = useState<Content[]>([]);
 
-    // 기간별 필터링
+    useEffect(() => {
+        const decryptAll = async () => {
+            const masterKey = getMasterKey();
+            if (!masterKey) {
+                setDecryptedJournals(initialJournals);
+                return;
+            }
+
+            const cryptoKey = await crypto.subtle.importKey(
+                'raw',
+                masterKey as BufferSource,
+                { name: 'AES-GCM' },
+                false,
+                ['decrypt'],
+            );
+
+            const decrypted = await Promise.all(
+                initialJournals.map(async (journal) => {
+                    try {
+                        if (journal.content?.iv && journal.content?.data) {
+                            const decryptedContent = await decryptText(journal.content, cryptoKey);
+                            return { ...journal, decryptedContent };
+                        }
+                        return { ...journal, decryptedContent: '' };
+                    } catch {
+                        return { ...journal, decryptedContent: '' };
+                    }
+                }),
+            );
+            setDecryptedJournals(decrypted);
+        };
+        decryptAll();
+    }, [initialJournals]);
+
     const filteredJournals = useMemo(
-        () => filterByPeriod(initialJournals, period),
-        [initialJournals, period],
+        () => filterByPeriod(decryptedJournals, period),
+        [decryptedJournals, period],
     );
 
-    // 통계 계산 (필터링된 데이터로)
     const stats: JournalStatsData = useMemo(
         () => ({
             totalCount: filteredJournals.length,
@@ -40,13 +75,11 @@ export default function StatClient({ initialJournals }: StatClientProps) {
         [filteredJournals],
     );
 
-    // 감정 분포 계산 (필터링된 데이터로)
     const moodStats = useMemo(
         () => calculateMoodDistribution(filteredJournals),
         [filteredJournals],
     );
 
-    // 월별 추이 계산 (필터링된 데이터로)
     const monthlyData = useMemo(() => calculateMonthlyTrend(filteredJournals), [filteredJournals]);
 
     return (
