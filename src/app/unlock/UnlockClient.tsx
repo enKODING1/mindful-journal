@@ -125,7 +125,7 @@ export default function UnlockClient() {
                         <KeyRound className="w-10 h-10 text-primary" />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-2xl font-bold">일기장 잠금 해제</h1>
+                        <h1 className="text-2xl font-bold text-primary">일기장 잠금 해제</h1>
                         <p className="text-base-content/70">
                             마음챙김 일기를 보려면
                             <br />

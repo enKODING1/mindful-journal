@@ -151,7 +151,7 @@ export default function SetupEncryptionClient() {
                             <BookOpen className="w-8 h-8 text-primary" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h1 className="text-2xl font-bold">
+                            <h1 className="text-2xl font-bold text-primary">
                                 마음챙김 일기에 오신 것을 환영합니다
                             </h1>
                             <p className="text-base-content/70">
@@ -204,7 +204,9 @@ export default function SetupEncryptionClient() {
                             <Shield className="w-8 h-8 text-success" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h1 className="text-2xl font-bold">당신만 읽을 수 있는 일기</h1>
+                            <h1 className="text-2xl font-bold text-primary">
+                                당신만 읽을 수 있는 일기
+                            </h1>
                             <p className="text-base-content/70">
                                 모든 일기는 암호화되어 저장됩니다
                             </p>
@@ -264,7 +266,7 @@ export default function SetupEncryptionClient() {
                             <Lock className="w-8 h-8 text-primary" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h1 className="text-2xl font-bold">암호 설정</h1>
+                            <h1 className="text-2xl font-bold text-primary">암호 설정</h1>
                             <p className="text-base-content/70">
                                 일기를 보호할 8~16자리 숫자 암호를 설정해주세요
                             </p>
@@ -390,7 +392,9 @@ export default function SetupEncryptionClient() {
                             <CheckCircle className="w-10 h-10 text-success" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h1 className="text-2xl font-bold">가입해주셔서 감사합니다!</h1>
+                            <h1 className="text-2xl font-bold text-primary">
+                                가입해주셔서 감사합니다!
+                            </h1>
                             <p className="text-base-content/70">
                                 안전한 암호화 키가 생성되었습니다.
                                 <br />

@@ -42,7 +42,7 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
             <header className="mb-10">
                 {/* 제목 */}
                 {title && (
-                    <h1 className="text-2xl md:text-3xl font-semibold text-base-content mb-4 leading-snug">
+                    <h1 className="text-2xl md:text-3xl font-semibold text-primary mb-4 leading-snug">
                         {title}
                     </h1>
                 )}

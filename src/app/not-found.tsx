@@ -10,7 +10,7 @@ export default function NotFound() {
             <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="text-8xl mb-6">🍃</div>
 
-                <h1 className="text-4xl font-bold mb-4">길을 잃으셨나요?</h1>
+                <h1 className="text-4xl font-bold mb-4 text-primary">길을 잃으셨나요?</h1>
 
                 <p className="text-base-content/70 text-lg mb-2">
                     찾으시는 페이지가 존재하지 않아요.

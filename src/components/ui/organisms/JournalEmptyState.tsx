@@ -34,7 +34,9 @@ export default function JournalEmptyState() {
             <div className="flex flex-col w-full items-center gap-3">
                 <Avatar size="lg" icon={<BookOpen />} />
                 <div className="flex flex-col items-center">
-                    <h3 className="text-xl bold font-bold">첫 번째 일기를 작성해보세요</h3>
+                    <h3 className="text-xl bold font-bold text-primary">
+                        첫 번째 일기를 작성해보세요
+                    </h3>
                     <p>
                         마음챙김 일기와 함께 하루하루의 소중한 순간들을 기록하고, 내면의 성장을
                         경험해보세요.

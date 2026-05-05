@@ -72,7 +72,7 @@ export default function JournalList({ journals, onJournalClick }: JournalListPro
             {groupedJournals.map((group) => (
                 <div key={group.yearMonth} className="flex flex-col gap-4">
                     {/* 월별 헤더 */}
-                    <h2 className="text-2xl font-bold text-base-content">{group.yearMonth}</h2>
+                    <h2 className="text-2xl font-bold text-primary">{group.yearMonth}</h2>
 
                     {/* 해당 월의 일기 목록 */}
                     <div className="flex flex-col gap-3">

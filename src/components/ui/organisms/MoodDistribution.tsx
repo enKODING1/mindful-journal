@@ -21,7 +21,7 @@ export default function MoodDistribution({ stats, className = '' }: MoodDistribu
                 className={className}
                 centered={false}
             >
-                <h3 className="text-xl font-bold">감정 분포</h3>
+                <h3 className="text-xl font-bold text-primary">감정 분포</h3>
                 <p className="text-base-content/70">아직 기록된 감정이 없습니다.</p>
             </Container>
         );
@@ -36,7 +36,7 @@ export default function MoodDistribution({ stats, className = '' }: MoodDistribu
             className={className}
             centered={false}
         >
-            <h3 className="text-xl font-bold">감정 분포</h3>
+            <h3 className="text-xl font-bold text-primary">감정 분포</h3>
 
             <div className="flex flex-col gap-4">
                 {stats.map(({ mood, count, percentage }) => (

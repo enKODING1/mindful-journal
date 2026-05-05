@@ -30,7 +30,7 @@ export default function MonthlyTrend({
                 className={className}
                 centered={false}
             >
-                <h3 className="text-xl font-bold">월별 추이</h3>
+                <h3 className="text-xl font-bold text-primary">월별 추이</h3>
                 <p className="text-base-content/70">아직 보관된 일기가 없습니다.</p>
             </Container>
         );
@@ -44,7 +44,7 @@ export default function MonthlyTrend({
             className={className}
             centered={false}
         >
-            <h3 className="text-xl font-bold mb-2">{title}</h3>
+            <h3 className="text-xl font-bold mb-2 text-primary">{title}</h3>
 
             <div className="flex flex-col gap-4">
                 {data.map((item) => (
