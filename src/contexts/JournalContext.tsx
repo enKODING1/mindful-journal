@@ -34,11 +34,11 @@ export function useJournals() {
  */
 async function decryptJournalContent(
     encryptedContent: { iv: string; data: string },
-    cryptoKey: CryptoKey,
+    masterKey: Uint8Array,
 ): Promise<string> {
     try {
         if (encryptedContent.iv && encryptedContent.data) {
-            return await decryptText(encryptedContent, cryptoKey);
+            return await decryptText(encryptedContent, masterKey);
         }
         return '[복호화 실패]';
     } catch {
@@ -49,11 +49,11 @@ async function decryptJournalContent(
 /**
  * 일기 목록 복호화
  */
-async function decryptJournals(journals: Content[], cryptoKey: CryptoKey): Promise<Content[]> {
+async function decryptJournals(journals: Content[], masterKey: Uint8Array): Promise<Content[]> {
     return Promise.all(
         journals.map(async (journal) => ({
             ...journal,
-            decryptedContent: await decryptJournalContent(journal.content, cryptoKey),
+            decryptedContent: await decryptJournalContent(journal.content, masterKey),
         })),
     );
 }
@@ -73,46 +73,32 @@ export function JournalProvider({
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(initialHasMore);
     const [page, setPage] = useState(0);
-    const [cryptoKey, setCryptoKey] = useState<CryptoKey | null>(null);
+    const [masterKey, setMasterKey] = useState<Uint8Array | null>(null);
     const [isInitialized, setIsInitialized] = useState(false);
 
     const supabase = createClient();
 
-    // DEK → CryptoKey 변환
     useEffect(() => {
-        const initCryptoKey = async () => {
-            const masterKey = getMasterKey();
-            if (masterKey) {
-                const key = await crypto.subtle.importKey(
-                    'raw',
-                    masterKey as BufferSource,
-                    { name: 'AES-GCM' },
-                    false,
-                    ['decrypt'],
-                );
-                setCryptoKey(key);
-            }
-        };
-        initCryptoKey();
+        setMasterKey(getMasterKey());
     }, []);
 
     // 초기 데이터 복호화
     useEffect(() => {
         const initJournals = async () => {
-            if (cryptoKey && initialJournals.length > 0 && !isInitialized) {
-                const decrypted = await decryptJournals(initialJournals, cryptoKey);
+            if (masterKey && initialJournals.length > 0 && !isInitialized) {
+                const decrypted = await decryptJournals(initialJournals, masterKey);
                 setJournals(decrypted);
                 setIsInitialized(true);
-            } else if (cryptoKey && initialJournals.length === 0) {
+            } else if (masterKey && initialJournals.length === 0) {
                 setIsInitialized(true);
             }
         };
         initJournals();
-    }, [cryptoKey, initialJournals, isInitialized]);
+    }, [masterKey, initialJournals, isInitialized]);
 
     // 더 불러오기
     const loadMore = useCallback(async () => {
-        if (!hasMore || loading || !cryptoKey) return;
+        if (!hasMore || loading || !masterKey) return;
 
         setLoading(true);
         try {
@@ -120,7 +106,7 @@ export function JournalProvider({
             const offset = nextPage * PAGE_SIZE;
             const data = await journalService.listJournalsByUser(supabase, PAGE_SIZE, offset);
 
-            const decrypted = await decryptJournals(data, cryptoKey);
+            const decrypted = await decryptJournals(data, masterKey);
 
             setJournals((prev) => [...prev, ...decrypted]);
             setPage(nextPage);
@@ -130,7 +116,7 @@ export function JournalProvider({
         } finally {
             setLoading(false);
         }
-    }, [hasMore, loading, page, supabase, cryptoKey]);
+    }, [hasMore, loading, page, supabase, masterKey]);
 
     // ID로 일기 찾기 (캐시된 데이터에서)
     const getJournalById = useCallback(
@@ -147,14 +133,14 @@ export function JournalProvider({
             const cached = journals.find((j) => j.id === id);
             if (cached) return cached;
 
-            if (!cryptoKey) return null;
+            if (!masterKey) return null;
 
             try {
                 const journal = await journalService.getJournalById(supabase, id);
                 if (journal) {
                     const decrypted: Content = {
                         ...journal,
-                        decryptedContent: await decryptJournalContent(journal.content, cryptoKey),
+                        decryptedContent: await decryptJournalContent(journal.content, masterKey),
                     };
                     // 캐시에 추가
                     setJournals((prev) => {
@@ -169,17 +155,17 @@ export function JournalProvider({
                 return null;
             }
         },
-        [journals, supabase, cryptoKey],
+        [journals, supabase, masterKey],
     );
 
     // 일기 목록 새로고침
     const refreshJournals = useCallback(async () => {
-        if (!cryptoKey) return;
+        if (!masterKey) return;
 
         setLoading(true);
         try {
             const data = await journalService.listJournalsByUser(supabase, PAGE_SIZE, 0);
-            const decrypted = await decryptJournals(data, cryptoKey);
+            const decrypted = await decryptJournals(data, masterKey);
             setJournals(decrypted);
             setPage(0);
             setHasMore(data.length === PAGE_SIZE);
@@ -188,7 +174,7 @@ export function JournalProvider({
         } finally {
             setLoading(false);
         }
-    }, [supabase, cryptoKey]);
+    }, [supabase, masterKey]);
 
     // 초기화 전 로딩 표시
     if (!isInitialized && initialJournals.length > 0) {

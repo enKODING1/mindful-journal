@@ -31,18 +31,11 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
         if (!decryptedJournal) return;
         setAiLoading(true);
         try {
-            // 1. DEK로 CryptoKey 생성 (암호화용)
+            // 1. DEK 가져오기
             const masterKey = getMasterKey();
             if (!masterKey) {
                 throw new Error('암호화 키가 없습니다.');
             }
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw',
-                masterKey as BufferSource,
-                { name: 'AES-GCM' },
-                false,
-                ['encrypt', 'decrypt'],
-            );
 
             // 2. Gemini API 호출 (복호화된 일기 내용만 전송)
             const response = await fetch('/api/gemini', {
@@ -61,7 +54,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                 return;
             }
             // 3. AI 응답 암호화
-            const encryptedComment = await encryptText(aiResponseText, cryptoKey);
+            const encryptedComment = await encryptText(aiResponseText, masterKey);
 
             // 4. DB에 저장
             const savedComment = await journalService.addAIComment(supabase, {
@@ -107,20 +100,12 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                     return;
                 }
 
-                const cryptoKey = await crypto.subtle.importKey(
-                    'raw',
-                    masterKey as BufferSource,
-                    { name: 'AES-GCM' },
-                    false,
-                    ['decrypt'],
-                );
-
                 let decryptedContent: string;
 
                 try {
                     // content가 이미 EncryptedContent 객체
                     if (journal.content.iv && journal.content.data) {
-                        decryptedContent = await decryptText(journal.content, cryptoKey);
+                        decryptedContent = await decryptText(journal.content, masterKey);
                     } else {
                         decryptedContent = '[복호화 실패]';
                     }
@@ -136,7 +121,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                             try {
                                 const decryptedComment = await decryptText(
                                     comment.comment,
-                                    cryptoKey,
+                                    masterKey,
                                 );
                                 return { ...comment, decryptedComment };
                             } catch {

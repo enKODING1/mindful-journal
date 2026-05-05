@@ -34,19 +34,11 @@ export default function StatClient({ initialJournals }: StatClientProps) {
                 return;
             }
 
-            const cryptoKey = await crypto.subtle.importKey(
-                'raw',
-                masterKey as BufferSource,
-                { name: 'AES-GCM' },
-                false,
-                ['decrypt'],
-            );
-
             const decrypted = await Promise.all(
                 initialJournals.map(async (journal) => {
                     try {
                         if (journal.content?.iv && journal.content?.data) {
-                            const decryptedContent = await decryptText(journal.content, cryptoKey);
+                            const decryptedContent = await decryptText(journal.content, masterKey);
                             return { ...journal, decryptedContent };
                         }
                         return { ...journal, decryptedContent: '' };

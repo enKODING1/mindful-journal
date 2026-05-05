@@ -33,17 +33,8 @@ export default function WriteClient({ hasWrittenToday, question }: WriteClientPr
                     throw new Error('암호화 키가 없습니다. 다시 로그인해주세요.');
                 }
 
-                // 2. DEK를 CryptoKey로 변환
-                const cryptoKey = await crypto.subtle.importKey(
-                    'raw',
-                    masterKey as BufferSource,
-                    { name: 'AES-GCM' },
-                    false,
-                    ['encrypt'],
-                );
-
-                // 3. 일기 내용 암호화
-                const encryptedContent = await encryptText(content, cryptoKey);
+                // 2. 일기 내용 암호화
+                const encryptedContent = await encryptText(content, masterKey);
 
                 // 4. 암호화된 일기 저장 (iv와 data 모두 저장)
                 const result = await fetch('/api/write', {

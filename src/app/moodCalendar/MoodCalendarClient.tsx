@@ -22,11 +22,11 @@ interface MoodCalendarClientProps {
  */
 async function decryptJournalContent(
     encryptedContent: { iv: string; data: string },
-    cryptoKey: CryptoKey,
+    masterKey: Uint8Array,
 ): Promise<string> {
     try {
         if (encryptedContent.iv && encryptedContent.data) {
-            return await decryptText(encryptedContent, cryptoKey);
+            return await decryptText(encryptedContent, masterKey);
         }
         return '[복호화 실패]';
     } catch {
@@ -42,32 +42,17 @@ export default function MoodCalendarClient({
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date(initialDate));
     const [journals, setJournals] = useState<Content[]>(initialJournals);
     const [decryptedJournals, setDecryptedJournals] = useState<Content[]>([]);
-    const [cryptoKey, setCryptoKey] = useState<CryptoKey | null>(null);
+    const [masterKey, setMasterKey] = useState<Uint8Array | null>(null);
     const supabase = useMemo(() => createClient(), []);
 
-    // DEK → CryptoKey 변환
     useEffect(() => {
-        const initCryptoKey = async () => {
-            const masterKey = getMasterKey();
-            if (masterKey) {
-                const key = await crypto.subtle.importKey(
-                    'raw',
-                    masterKey as BufferSource,
-                    { name: 'AES-GCM' },
-                    false,
-                    ['decrypt'],
-                );
-                setCryptoKey(key);
-            }
-        };
-        initCryptoKey();
+        setMasterKey(getMasterKey());
     }, []);
 
     // journals 변경 시 복호화
     useEffect(() => {
         const decryptJournals = async () => {
-            // cryptoKey가 없으면 복호화 대기 (빈 배열 유지)
-            if (!cryptoKey) {
+            if (!masterKey) {
                 return;
             }
 
@@ -79,13 +64,13 @@ export default function MoodCalendarClient({
             const decrypted = await Promise.all(
                 journals.map(async (journal) => ({
                     ...journal,
-                    decryptedContent: await decryptJournalContent(journal.content, cryptoKey),
+                    decryptedContent: await decryptJournalContent(journal.content, masterKey),
                 })),
             );
             setDecryptedJournals(decrypted);
         };
         decryptJournals();
-    }, [journals, cryptoKey]);
+    }, [journals, masterKey]);
 
     // 날짜가 변경되면 해당 날짜의 일기를 fetch
     const fetchJournalsByDate = useCallback(
