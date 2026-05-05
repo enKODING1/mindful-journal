@@ -20,30 +20,30 @@ export default function JournalStats({ stats, className = '' }: JournalStatsProp
             <StatCard
                 title={stats.totalCount.toString()}
                 text="총 일기 수"
-                color="primary"
+                color="secondary"
                 size="xs"
-                className="bg-primary/10"
+                className="bg-base-200"
             />
             <StatCard
                 title={stats.currentStreak.toString()}
                 text="연속 작성일"
-                color="success"
+                color="secondary"
                 size="xs"
-                className="bg-success/10"
+                className="bg-base-200"
             />
             <StatCard
                 title={stats.longestStreak.toString()}
                 text="최장 연속일"
                 color="secondary"
                 size="xs"
-                className="bg-secondary/10"
+                className="bg-base-200"
             />
             <StatCard
                 title={stats.avgWordCount.toString()}
                 text="평균 글자 수"
-                color="warning"
+                color="secondary"
                 size="xs"
-                className="bg-warning/10"
+                className="bg-base-200"
             />
         </div>
     );
