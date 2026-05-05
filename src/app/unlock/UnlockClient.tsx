@@ -118,7 +118,7 @@ export default function UnlockClient() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
-            <Container className="w-full max-w-md flex flex-col gap-6">
+            <Container className="w-full max-w-md flex flex-col gap-6" variant="base-100">
                 {/* 아이콘 및 타이틀 */}
                 <div className="flex flex-col items-center gap-4 text-center">
                     <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
