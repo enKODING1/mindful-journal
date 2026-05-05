@@ -4,7 +4,6 @@ import Container from '@/components/ui/atom/Container';
 import Avatar from '@/components/ui/atom/Avatar';
 import Button from '@/components/ui/atom/Button';
 import { useAuth } from '@/hooks';
-import { BookOpen } from 'lucide-react';
 
 export default function AuthPage() {
     const { loginWithGoogle, loading, error } = useAuth();
@@ -20,9 +19,9 @@ export default function AuthPage() {
                 className="max-w-md w-full"
             >
                 <div className="flex flex-col items-center gap-4 text-center">
-                    <Avatar size="lg" icon={<BookOpen />} />
+                    <Avatar size="lg" src="/icon_wave.svg" />
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-3xl font-bold">마음챙김 일기</h1>
+                        <h1 className="text-3xl font-bold text-primary">마음챙김 일기</h1>
                         <p className="text-base-content/70">
                             매일의 생각과 감정을 기록하며
                             <br />
