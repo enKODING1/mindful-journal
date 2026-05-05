@@ -1,72 +1,63 @@
+import { gcm } from '@noble/ciphers/aes.js';
+
+const PBKDF2_ITERATIONS = 600000;
+const KEY_LEN_BITS = 256;
+
 /**
- * 비밀번호를 암호화 키로 변환 (PBKDF2)
+ * 비밀번호를 32바이트 raw key로 변환 (PBKDF2-SHA256, Web Crypto 네이티브)
  */
-export async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
+export async function deriveKey(password: string, salt: Uint8Array): Promise<Uint8Array> {
     const encoder = new TextEncoder();
 
-    // 비밀번호를 키 재료로 변환
     const keyMaterial = await crypto.subtle.importKey(
         'raw',
         encoder.encode(password),
         'PBKDF2',
         false,
-        ['deriveKey'],
+        ['deriveBits'],
     );
 
-    // PBKDF2로 키 생성
-    return crypto.subtle.deriveKey(
+    const bits = await crypto.subtle.deriveBits(
         {
             name: 'PBKDF2',
             salt: salt as BufferSource,
-            iterations: 600000, // 60만 번 반복 (보안 강화)
+            iterations: PBKDF2_ITERATIONS,
             hash: 'SHA-256',
         },
         keyMaterial,
-        { name: 'AES-GCM', length: 256 },
-        false,
-        ['encrypt', 'decrypt'],
+        KEY_LEN_BITS,
     );
+
+    return new Uint8Array(bits);
 }
 
 /**
- * 데이터 암호화 (AES-GCM)
+ * 데이터 암호화 (AES-GCM, @noble/ciphers)
  */
 export async function encrypt(
     data: Uint8Array,
-    key: CryptoKey,
+    key: Uint8Array,
 ): Promise<{ iv: string; data: string }> {
-    // 랜덤 IV 생성 (12바이트)
     const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = gcm(key, iv).encrypt(data);
 
-    // 암호화
-    const encrypted = await crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv: iv as BufferSource },
-        key,
-        data as BufferSource,
-    );
-
-    // Base64로 인코딩해서 반환
     return {
         iv: btoa(String.fromCharCode(...iv)),
-        data: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+        data: btoa(String.fromCharCode(...encrypted)),
     };
 }
 
 /**
- * 데이터 복호화 (AES-GCM)
+ * 데이터 복호화 (AES-GCM, @noble/ciphers)
  */
 export async function decrypt(
     encrypted: { iv: string; data: string },
-    key: CryptoKey,
+    key: Uint8Array,
 ): Promise<Uint8Array> {
-    // Base64 디코딩
     const iv = Uint8Array.from(atob(encrypted.iv), (c) => c.charCodeAt(0));
     const data = Uint8Array.from(atob(encrypted.data), (c) => c.charCodeAt(0));
 
-    // 복호화
-    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
-
-    return new Uint8Array(decrypted);
+    return gcm(key, iv).decrypt(data);
 }
 
 /**
@@ -74,7 +65,7 @@ export async function decrypt(
  */
 export async function encryptText(
     text: string,
-    key: CryptoKey,
+    key: Uint8Array,
 ): Promise<{ iv: string; data: string }> {
     const encoder = new TextEncoder();
     return encrypt(encoder.encode(text), key);
@@ -85,7 +76,7 @@ export async function encryptText(
  */
 export async function decryptText(
     encrypted: { iv: string; data: string },
-    key: CryptoKey,
+    key: Uint8Array,
 ): Promise<string> {
     const decrypted = await decrypt(encrypted, key);
     const decoder = new TextDecoder();

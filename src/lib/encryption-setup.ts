@@ -114,16 +114,7 @@ export async function encryptDiary(content: string): Promise<{ iv: string; data:
         throw new Error('마스터키가 없습니다');
     }
 
-    // DEK를 CryptoKey로 변환
-    const key = await crypto.subtle.importKey(
-        'raw',
-        masterKey as BufferSource,
-        { name: 'AES-GCM' },
-        false,
-        ['encrypt'],
-    );
-
-    return encryptText(content, key);
+    return encryptText(content, masterKey);
 }
 
 /**
@@ -135,14 +126,5 @@ export async function decryptDiary(encrypted: { iv: string; data: string }): Pro
         throw new Error('마스터키가 없습니다');
     }
 
-    // DEK를 CryptoKey로 변환
-    const key = await crypto.subtle.importKey(
-        'raw',
-        masterKey as BufferSource,
-        { name: 'AES-GCM' },
-        false,
-        ['decrypt'],
-    );
-
-    return decryptText(encrypted, key);
+    return decryptText(encrypted, masterKey);
 }
