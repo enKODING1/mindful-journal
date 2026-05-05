@@ -30,7 +30,7 @@ const featureCards: FeatureCardProps[] = [
 
 export default function JournalEmptyState() {
     return (
-        <Container variant="base-300" padding="xl" gap="md" rounded="2xl" centered={false}>
+        <Container variant="base-100" padding="xl" gap="md" rounded="2xl" centered={false}>
             <div className="flex flex-col w-full items-center gap-3">
                 <Avatar size="lg" icon={<BookOpen />} />
                 <div className="flex flex-col items-center">

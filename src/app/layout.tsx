@@ -24,7 +24,7 @@ export default function RootLayout({
     return (
         <html lang="ko">
             <body
-                className={`${jua.variable} antialiased bg-base-300 min-h-screen font-[family-name:var(--font-jua)]`}
+                className={`${jua.variable} antialiased bg-base-100 min-h-screen font-[family-name:var(--font-jua)]`}
             >
                 <GoogleAnalytics />
                 <Slider />

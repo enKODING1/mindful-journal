@@ -153,7 +153,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
 
     if (loading) {
         return (
-            <Container className="mt-10" variant="base-300" padding="xl" gap="lg" rounded="2xl">
+            <Container className="mt-10" variant="base-100" padding="xl" gap="lg" rounded="2xl">
                 <div className="flex flex-col items-center justify-center py-12">
                     <span className="loading loading-spinner loading-lg text-primary"></span>
                     <p className="text-base-content/70 mt-4">일기를 복호화하는 중...</p>
@@ -164,7 +164,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
 
     if (error || decryptError || !decryptedJournal) {
         return (
-            <Container className="mt-10" variant="base-300" padding="xl" gap="lg" rounded="2xl">
+            <Container className="mt-10" variant="base-100" padding="xl" gap="lg" rounded="2xl">
                 <div className="text-center py-12">
                     <p className="text-error mb-4">
                         {error || decryptError || '일기를 찾을 수 없습니다'}

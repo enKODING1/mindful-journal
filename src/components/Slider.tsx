@@ -39,14 +39,14 @@ export default function Slider() {
     return (
         <>
             {/* 모바일: 상단 navbar (메뉴 버튼 없이 배경색만 유지) */}
-            <div className="navbar bg-base-300 md:hidden"></div>
+            <div className="navbar bg-base-100 md:hidden"></div>
 
             {/* 데스크톱: Side Drawer (md 이상에서만 표시) */}
             <div className="hidden md:block">
                 <div className="drawer">
                     <input id="my-drawer" type="checkbox" className="drawer-toggle" />
                     <div className="drawer-content">
-                        <div className="navbar bg-base-300 shadow-lg">
+                        <div className="navbar bg-base-100 shadow-lg">
                             <div className="navbar-start">
                                 <label
                                     htmlFor="my-drawer"
@@ -65,7 +65,7 @@ export default function Slider() {
                             aria-label="close sidebar"
                             className="drawer-overlay"
                         ></label>
-                        <ul className="menu bg-base-300 text-base-content min-h-full w-80 p-4">
+                        <ul className="menu bg-base-100 text-base-content min-h-full w-80 p-4">
                             {menuItems.map((item) => (
                                 <li key={item.path}>
                                     <Link

@@ -75,7 +75,7 @@ export default function StatClient({ initialJournals }: StatClientProps) {
     const monthlyData = useMemo(() => calculateMonthlyTrend(filteredJournals), [filteredJournals]);
 
     return (
-        <Container padding="xl" className="flex flex-col gap-4">
+        <Container padding="xl" className="flex flex-col gap-4" variant="base-100">
             <PeriodTab value={period} onChange={setPeriod} />
             <JournalStats stats={stats} />
             <MoodDistribution stats={moodStats} />

@@ -36,7 +36,7 @@ function HomeContent() {
     };
 
     return (
-        <Container className="mt-10" variant="base-300" padding="xl" gap="lg" rounded="2xl">
+        <Container className="mt-10" variant="base-100" padding="xl" gap="lg" rounded="2xl">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-primary">내 일기</h1>
             </div>

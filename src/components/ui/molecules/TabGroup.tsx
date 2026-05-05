@@ -50,7 +50,7 @@ export default function TabGroup({ items, value, defaultValue, onChange }: TabGr
 
     return (
         <Container
-            variant="base-300"
+            variant="base-100"
             padding="xs"
             gap="xs"
             rounded="xl"

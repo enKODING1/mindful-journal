@@ -6,7 +6,7 @@ import Container from '@/components/ui/atom/Container';
 
 export default function NotFound() {
     return (
-        <Container className="mt-10" variant="base-300" padding="xl" gap="lg" rounded="2xl">
+        <Container className="mt-10" variant="base-100" padding="xl" gap="lg" rounded="2xl">
             <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="text-8xl mb-6">🍃</div>
 

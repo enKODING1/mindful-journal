@@ -27,7 +27,7 @@ export default function JournalCard({
             onClick={onClick}
             className={`
                 group cursor-pointer p-5
-                bg-base-100 rounded-xl
+                bg-base-200 rounded-xl
                 border border-base-200
                 hover:border-base-300 hover:shadow-sm
                 transition-all duration-200

@@ -25,7 +25,7 @@ export default function SettingClient({ profile }: SettingClientProps) {
     };
 
     return (
-        <Container className="mt-10" variant="base-300" padding="xl" gap="lg" rounded="2xl">
+        <Container className="mt-10" variant="base-200" padding="xl" gap="lg" rounded="2xl">
             {/* 프로필 섹션 */}
             <section className="flex items-center gap-6">
                 {/* 아바타 */}
