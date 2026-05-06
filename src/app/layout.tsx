@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Jua } from 'next/font/google';
 import Slider from '@/components/Slider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import { MasterKeyProvider } from '@/lib/useMasterKey';
 import './globals.css';
 
@@ -13,7 +14,13 @@ const jua = Jua({
 
 export const metadata: Metadata = {
     title: '마음챙김 일기',
-    description: '마음챙김 일기',
+    description: '매일의 생각과 감정을 기록하는 나만의 암호화 일기',
+    manifest: '/manifest.json',
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: 'default',
+        title: '마음챙김 일기',
+    },
 };
 
 export default function RootLayout({
@@ -27,6 +34,7 @@ export default function RootLayout({
                 className={`${jua.variable} antialiased bg-base-100 min-h-screen font-[family-name:var(--font-jua)]`}
             >
                 <GoogleAnalytics />
+                <ServiceWorkerRegister />
                 <Slider />
                 <MasterKeyProvider>
                     <main className="pb-16 md:pb-0">{children}</main>
