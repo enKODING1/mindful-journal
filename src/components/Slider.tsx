@@ -70,6 +70,7 @@ export default function Slider() {
                                 <li key={item.path}>
                                     <Link
                                         href={item.path}
+                                        prefetch={false}
                                         className={`flex items-center gap-3 ${isActive(item.path) ? 'active' : ''}`}
                                     >
                                         <item.icon size={15} />
@@ -88,6 +89,7 @@ export default function Slider() {
                     <Link
                         key={item.path}
                         href={item.path}
+                        prefetch={false}
                         className={isActive(item.path) ? 'dock-active' : ''}
                     >
                         <item.icon size={20} />
