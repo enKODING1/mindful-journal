@@ -21,6 +21,11 @@ export const metadata: Metadata = {
         statusBarStyle: 'default',
         title: '마음챙김 일기',
     },
+    viewport: {
+        width: 'device-width',
+        initialScale: 1,
+        viewportFit: 'cover',
+    },
 };
 
 export default function RootLayout({
@@ -37,7 +42,9 @@ export default function RootLayout({
                 <ServiceWorkerRegister />
                 <Slider />
                 <MasterKeyProvider>
-                    <main className="pb-16 md:pb-0">{children}</main>
+                    <main className="pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
+                        {children}
+                    </main>
                 </MasterKeyProvider>
             </body>
         </html>
