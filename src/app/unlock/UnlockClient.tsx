@@ -95,6 +95,14 @@ export default function UnlockClient() {
                 const masterKeyBase64 = btoa(String.fromCharCode(...masterKey));
                 localStorage.setItem('masterKey', masterKeyBase64);
 
+                // 기존 유저 마이그레이션: 메타데이터 플래그가 없으면 설정
+                const {
+                    data: { session },
+                } = await supabase.auth.getSession();
+                if (session && !session.user.user_metadata?.has_encryption_key) {
+                    await supabase.auth.updateUser({ data: { has_encryption_key: true } });
+                }
+
                 // 8. 홈으로 이동
                 router.push('/');
             } catch {

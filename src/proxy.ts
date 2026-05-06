@@ -16,7 +16,7 @@ const publicPaths = ['/login', '/auth/callback'];
 export async function proxy(req: NextRequest) {
     const res = NextResponse.next();
     const { pathname } = req.nextUrl;
-
+    console.log('running middleware...');
     if (publicPaths.some((path) => pathname.startsWith(path))) {
         return res;
     }
@@ -32,20 +32,14 @@ export async function proxy(req: NextRequest) {
     const supabase = createMiddlewareClient(req, res);
 
     const {
-        data: { user },
-    } = await supabase.auth.getUser();
+        data: { session },
+    } = await supabase.auth.getSession();
 
-    if (!user) {
+    if (!session) {
         return NextResponse.redirect(new URL('/login', req.url));
     }
-    // setup-encryption
-    const { data: encryption_key } = await supabase
-        .from('encryption_keys')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-    if (!encryption_key) {
+    const hasEncryptionKey = session.user.user_metadata?.has_encryption_key === true;
+    if (!hasEncryptionKey) {
         return NextResponse.redirect(new URL('/setup-encryption', req.url));
     }
 

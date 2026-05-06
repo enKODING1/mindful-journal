@@ -112,6 +112,8 @@ export default function SetupEncryptionClient() {
                 return;
             }
 
+            await supabase.auth.updateUser({ data: { has_encryption_key: true } });
+
             // localStorage에 DEK 저장
 
             const masterKeyBase64 = btoa(String.fromCharCode(...masterKey));
