@@ -81,7 +81,10 @@ export default function Slider() {
             </div>
 
             {/* 모바일: Bottom Navigator (md 미만에서만 표시) */}
-            <div className="dock md:hidden pb-[env(safe-area-inset-bottom)]">
+            <div
+                className="dock md:hidden"
+                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+            >
                 {menuItems.map((item) => (
                     <Link
                         key={item.path}

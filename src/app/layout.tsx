@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Jua } from 'next/font/google';
 import Slider from '@/components/Slider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
@@ -21,11 +21,12 @@ export const metadata: Metadata = {
         statusBarStyle: 'default',
         title: '마음챙김 일기',
     },
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-        viewportFit: 'cover',
-    },
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -42,7 +43,10 @@ export default function RootLayout({
                 <ServiceWorkerRegister />
                 <Slider />
                 <MasterKeyProvider>
-                    <main className="pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
+                    <main
+                        className="md:pb-0"
+                        style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
+                    >
                         {children}
                     </main>
                 </MasterKeyProvider>
