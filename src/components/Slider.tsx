@@ -38,9 +38,6 @@ export default function Slider() {
 
     return (
         <>
-            {/* 모바일: 상단 navbar (메뉴 버튼 없이 배경색만 유지) */}
-            <div className="navbar bg-base-100 md:hidden"></div>
-
             {/* 데스크톱: Side Drawer (md 이상에서만 표시) */}
             <div className="hidden md:block">
                 <div className="drawer">
