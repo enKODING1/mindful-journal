@@ -1,23 +1,35 @@
 import { Content, MoodStat, Mood } from '@/domain/models';
-import { getToday } from '@/lib/utils';
 
 export type Period = 'week' | 'month' | 'year' | 'all';
 
+// 브라우저의 timezone을 자동 감지해 UTC 타임스탬프를 로컬 날짜(YYYY-MM-DD)로 변환
+function toLocalDateString(utcString: string, timeZone: string): string {
+    return new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date(utcString));
+}
+
+function getTimeZone(): string {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
 // 현재 시간을 기준으로 오늘인지 확인
 export function isToday(dateString: string): boolean {
-    const today = getToday();
-    return dateString.startsWith(today);
+    const timeZone = getTimeZone();
+    const todayLocal = new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date());
+    return toLocalDateString(dateString, timeZone) === todayLocal;
 }
 
-// 오늘 작성한 일기가 있는지 확인
+// 오늘 작성한 일기가 있는지 확인 (클라이언트에서 호출 시 사용자 timezone 자동 적용)
 export function hasWrittenToday(contents: Content[]): boolean {
-    const today = getToday();
-    return contents.some((content) => content.created_at.startsWith(today));
+    const timeZone = getTimeZone();
+    const todayLocal = new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date());
+    return contents.some(
+        (content) => toLocalDateString(content.created_at, timeZone) === todayLocal,
+    );
 }
 
-// 날짜 문자열을 YYYY-MM-DD 형식으로 변환
+// UTC 타임스탬프를 로컬 날짜(YYYY-MM-DD)로 변환
 function toDateString(dateString: string): string {
-    return dateString.split('T')[0];
+    return toLocalDateString(dateString, getTimeZone());
 }
 
 // 두 날짜가 연속된 날짜인지 확인
@@ -40,10 +52,12 @@ export function calculateCurrentStreak(contents: Content[]): number {
 
     if (dates.length === 0) return 0;
 
-    const today = getToday();
+    const timeZone = getTimeZone();
+    const fmt = new Intl.DateTimeFormat('en-CA', { timeZone });
+    const today = fmt.format(new Date());
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    const yesterdayStr = fmt.format(yesterday);
 
     // 오늘 또는 어제 작성하지 않았으면 연속 기록 끊김
     if (dates[0] !== today && dates[0] !== yesterdayStr) {

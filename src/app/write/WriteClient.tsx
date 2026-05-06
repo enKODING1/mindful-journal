@@ -4,18 +4,20 @@ import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import JournalForm from '@/components/ui/organisms/JournalForm';
 import Alert from '@/components/ui/atom/Alert';
-import { Mood, Question } from '@/domain/models';
+import { Content, Mood, Question } from '@/domain/models';
 import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
+import { hasWrittenToday as checkHasWrittenToday } from '@/domain/utils';
 import { encryptText } from '@/lib/crypto';
 import { getMasterKey } from '@/lib/useMasterKey';
 
 interface WriteClientProps {
-    hasWrittenToday: boolean;
+    journals: Content[];
     question: Question | null;
 }
 
-export default function WriteClient({ hasWrittenToday, question }: WriteClientProps) {
+export default function WriteClient({ journals, question }: WriteClientProps) {
+    const hasWrittenToday = checkHasWrittenToday(journals);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
