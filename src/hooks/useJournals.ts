@@ -72,14 +72,18 @@ export function useJournals() {
 
     // 일기 생성
     const createJournal = useCallback(
-        async (content: { iv: string; data: string }, mood: Mood) => {
+        async (
+            content: { iv: string; data: string },
+            mood: Mood,
+            title: { iv: string; data: string },
+        ) => {
             setLoading(true);
             setError(null);
             try {
                 await journalService.createJournal(supabase, {
                     content,
                     mood,
-                    questionId: question?.id,
+                    title,
                 });
                 // 성공 후 새로고침 또는 리다이렉트
                 router.refresh();

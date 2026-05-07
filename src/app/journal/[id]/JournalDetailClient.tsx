@@ -117,7 +117,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
 
                 try {
                     // title이 이미 EncryptedTitle 객체
-                    if (journal.title.iv && journal.title.data) {
+                    if (journal.title?.iv && journal.title?.data) {
                         decryptedTitle = await decryptText(journal.title, masterKey);
                     } else {
                         decryptedTitle = '[복호화 실패]';
