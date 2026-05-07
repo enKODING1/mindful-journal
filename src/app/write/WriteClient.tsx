@@ -19,7 +19,7 @@ interface WriteClientProps {
 
 function defaultTitle() {
     const date = getToday().split('-');
-    return `${date[0]}년 ${date[1]}월 ${date[2]}의 이야기`;
+    return `${date[0]}년 ${date[1]}월 ${date[2]}일의 이야기`;
 }
 
 export default function WriteClient({ journals }: WriteClientProps) {
