@@ -1,0 +1,24 @@
+# Storybook
+.storybook
+storybook-static
+**/*.stories.tsx
+**/*.stories.ts
+**/*.stories.jsx
+**/*.stories.js
+**/*.mdx
+
+# Tests
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__
+__mocks__
+coverage
+
+# Test config
+jest.config.*
+vitest.config.*
+playwright.config.*
+cypress
+e2e
