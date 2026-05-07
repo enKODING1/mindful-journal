@@ -6,7 +6,7 @@ import { getToday } from '@/lib/utils';
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { content, mood, questionId } = body;
+        const { content, mood, title } = body;
         if (!content || !mood) {
             return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
         }
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         const result = await journalService.createJournal(supabase, {
             content,
             mood,
-            questionId,
+            title,
             date: getToday(),
         });
 

@@ -3,11 +3,11 @@ import { Content, MoodStat, Mood } from '@/domain/models';
 export type Period = 'week' | 'month' | 'year' | 'all';
 
 // 브라우저의 timezone을 자동 감지해 UTC 타임스탬프를 로컬 날짜(YYYY-MM-DD)로 변환
-function toLocalDateString(utcString: string, timeZone: string): string {
+export function toLocalDateString(utcString: string, timeZone: string): string {
     return new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date(utcString));
 }
 
-function getTimeZone(): string {
+export function getTimeZone(): string {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 

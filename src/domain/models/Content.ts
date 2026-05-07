@@ -3,6 +3,7 @@ import { AIComment } from './Comment';
 import { Question } from './Question';
 
 export type EncryptedContent = { iv: string; data: string };
+export type EncryptedTitle = { iv: string; data: string };
 
 export interface Content {
     id: string;
@@ -12,6 +13,8 @@ export interface Content {
     mood: Mood;
     question_id?: number;
     question?: Question;
+    title: EncryptedTitle;
+    decryptedTitle?: string;
     ai_comments?: AIComment[];
 }
 

@@ -3,6 +3,7 @@
 import JournalCard from '../molecules/JournalCard';
 import type { Content } from '@/domain/models';
 import JournalEmptyState from './JournalEmptyState';
+import { getTimeZone } from '@/domain/utils';
 
 export interface JournalListProps {
     journals: Content[];
@@ -64,6 +65,16 @@ const groupJournalsByMonth = (journals: Content[]): GroupedJournals[] => {
         });
 };
 
+const getTitle = (createdAt: string): string => {
+    const timeZone = getTimeZone();
+    const todayLocal = new Intl.DateTimeFormat('en-CA', {
+        timeZone,
+    }).format(new Date(createdAt));
+
+    const date = todayLocal.split('-');
+    return `${date[0]}년 ${date[1]}월 ${date[2]}일의 이야기`;
+};
+
 export default function JournalList({ journals, onJournalClick }: JournalListProps) {
     const groupedJournals = groupJournalsByMonth(journals);
 
@@ -80,9 +91,8 @@ export default function JournalList({ journals, onJournalClick }: JournalListPro
                             // 복호화된 내용 사용 (없으면 빈 문자열)
                             const content = journal.decryptedContent ?? '';
                             // 질문이 있으면 질문을 제목으로, 없으면 첫 줄을 제목으로
-                            const title =
-                                journal.question?.question || content.split('\n')[0] || '제목 없음';
-                            // 내용 미리보기
+                            const title = journal.decryptedTitle || getTitle(journal.created_at);
+
                             const contentPreview = content.split('\n').slice(0, 2).join(' ').trim();
 
                             return (

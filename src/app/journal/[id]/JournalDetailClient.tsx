@@ -113,6 +113,19 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                     decryptedContent = '[복호화 실패]';
                 }
 
+                let decryptedTitle: string;
+
+                try {
+                    // title이 이미 EncryptedTitle 객체
+                    if (journal.title.iv && journal.title.data) {
+                        decryptedTitle = await decryptText(journal.title, masterKey);
+                    } else {
+                        decryptedTitle = '[복호화 실패]';
+                    }
+                } catch {
+                    decryptedTitle = '[복호화 실패]';
+                }
+
                 // ai_comments 복호화
                 let decryptedAIComments: AIComment[] = [];
                 if (journal.ai_comments && journal.ai_comments.length > 0) {
@@ -134,6 +147,7 @@ export default function JournalDetailClient({ journal, error }: JournalDetailCli
                 setDecryptedJournal({
                     ...journal,
                     decryptedContent,
+                    decryptedTitle,
                     ai_comments: decryptedAIComments,
                 });
             } catch (err) {

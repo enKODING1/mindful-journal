@@ -1,28 +1,39 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import JournalForm from '@/components/ui/organisms/JournalForm';
 import Alert from '@/components/ui/atom/Alert';
 import { Content, Mood, Question } from '@/domain/models';
 import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
+import Input from '@/components/ui/atom/Input';
 import { hasWrittenToday as checkHasWrittenToday } from '@/domain/utils';
 import { encryptText } from '@/lib/crypto';
 import { getMasterKey } from '@/lib/useMasterKey';
+import { getToday } from '@/lib/utils';
 
 interface WriteClientProps {
     journals: Content[];
-    question: Question | null;
 }
 
-export default function WriteClient({ journals, question }: WriteClientProps) {
+function defaultTitle() {
+    const date = getToday().split('-');
+    return `${date[0]}년 ${date[1]}월 ${date[2]}의 이야기`;
+}
+
+export default function WriteClient({ journals }: WriteClientProps) {
     const hasWrittenToday = checkHasWrittenToday(journals);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [title, setTitle] = useState(defaultTitle);
     const router = useRouter();
     const supabase = useMemo(() => createClient(), []);
+
+    const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTitle(() => e.target.value);
+    };
 
     const handleSubmit = useCallback(
         async (content: string, mood: Mood) => {
@@ -37,6 +48,7 @@ export default function WriteClient({ journals, question }: WriteClientProps) {
 
                 // 2. 일기 내용 암호화
                 const encryptedContent = await encryptText(content, masterKey);
+                const encryptedTitle = await encryptText(title, masterKey);
 
                 // 4. 암호화된 일기 저장 (iv와 data 모두 저장)
                 const result = await fetch('/api/write', {
@@ -45,9 +57,11 @@ export default function WriteClient({ journals, question }: WriteClientProps) {
                     body: JSON.stringify({
                         content: encryptedContent,
                         mood,
-                        questionId: question?.id,
+                        title: encryptedTitle,
+                        // questionId: question?.id,
                     }),
                 });
+
                 if (!result.ok) {
                     throw new Error('일기 저장에 실패했습니다');
                 }
@@ -63,7 +77,7 @@ export default function WriteClient({ journals, question }: WriteClientProps) {
                 setLoading(false);
             }
         },
-        [supabase, router, question],
+        [supabase, router, handleTitle],
     );
 
     if (hasWrittenToday) {
@@ -79,9 +93,14 @@ export default function WriteClient({ journals, question }: WriteClientProps) {
     return (
         <div className="mt-16 max-w-2xl mx-auto px-4">
             {/* 질문 */}
-            <p className="text-lg text-base-content/80 mb-8 text-center">
-                {question?.question ?? '하루 중 기억하고 싶은 순간은 무엇인가요?'}
-            </p>
+            {/* <p className="text-lg text-base-content/80 mb-8 text-center">{`${title[0]}년 ${title[1]}월 ${title[2]}의 이야기`}</p> */}
+            {/* <p className="text-lg text-base-content/80 mb-8 text-center">{`${title[0]}년 ${title[1]}월 ${title[2]}의 이야기`}</p> */}
+            <Input
+                inputSize="md"
+                value={title}
+                className={'w-full mb-2'}
+                onChange={handleTitle}
+            ></Input>
 
             {/* 알림 메시지 */}
             {successMessage && (

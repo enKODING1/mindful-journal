@@ -25,7 +25,7 @@ export default function JournalDetailView({ journal, onBack }: JournalDetailView
     // 복호화된 내용 사용 (없으면 빈 문자열)
     const content = journal.decryptedContent ?? '';
     // 질문이 있으면 질문을, 없으면 내용의 첫 줄을 제목으로
-    const title = journal.question?.question || content.split('\n')[0] || '';
+    const title = journal.decryptedTitle || content.split('\n')[0] || '';
     // 제목으로 사용한 첫 줄을 제외한 나머지 내용
     const bodyContent = journal.question ? content : content.split('\n').slice(1).join('\n').trim();
 

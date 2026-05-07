@@ -54,6 +54,7 @@ async function decryptJournals(journals: Content[], masterKey: Uint8Array): Prom
         journals.map(async (journal) => ({
             ...journal,
             decryptedContent: await decryptJournalContent(journal.content, masterKey),
+            decryptedTitle: await decryptJournalContent(journal.title, masterKey),
         })),
     );
 }
@@ -87,6 +88,7 @@ export function JournalProvider({
         const initJournals = async () => {
             if (masterKey && initialJournals.length > 0 && !isInitialized) {
                 const decrypted = await decryptJournals(initialJournals, masterKey);
+                console.log(decrypted);
                 setJournals(decrypted);
                 setIsInitialized(true);
             } else if (masterKey && initialJournals.length === 0) {
@@ -141,6 +143,7 @@ export function JournalProvider({
                     const decrypted: Content = {
                         ...journal,
                         decryptedContent: await decryptJournalContent(journal.content, masterKey),
+                        decryptedTitle: await decryptJournalContent(journal.title, masterKey),
                     };
                     // 캐시에 추가
                     setJournals((prev) => {
