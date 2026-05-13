@@ -24,7 +24,7 @@ export default function MonthlyTrend({
         return (
             <Container
                 variant="base-100"
-                padding="xl"
+                padding="none"
                 gap="md"
                 rounded="2xl"
                 className={className}
@@ -38,7 +38,7 @@ export default function MonthlyTrend({
     return (
         <Container
             variant="base-100"
-            padding="xl"
+            padding="none"
             gap="md"
             rounded="2xl"
             className={className}

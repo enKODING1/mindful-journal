@@ -51,7 +51,7 @@ export default function TabGroup({ items, value, defaultValue, onChange }: TabGr
     return (
         <Container
             variant="base-100"
-            padding="xs"
+            padding="none"
             gap="xs"
             rounded="xl"
             className="flex-row"

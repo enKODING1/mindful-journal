@@ -16,7 +16,7 @@ export interface JournalStatsProps {
 
 export default function JournalStats({ stats, className = '' }: JournalStatsProps) {
     return (
-        <div className={`grid grid-cols-4 gap-4 ${className} `}>
+        <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 ${className} `}>
             <StatCard
                 title={stats.totalCount.toString()}
                 text="총 일기 수"
