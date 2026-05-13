@@ -11,6 +11,7 @@ import createClient from '@/db/supabase/client';
 import * as journalService from '@/services/journalService';
 import { decryptText } from '@/lib/crypto';
 import { getMasterKey } from '@/lib/useMasterKey';
+import { getTimeZone } from '@/domain/utils';
 
 interface MoodCalendarClientProps {
     initialJournals: Content[];
@@ -33,6 +34,16 @@ async function decryptJournalContent(
         return '[복호화 실패]';
     }
 }
+
+const getTitle = (createdAt: string): string => {
+    const timeZone = getTimeZone();
+    const todayLocal = new Intl.DateTimeFormat('en-CA', {
+        timeZone,
+    }).format(new Date(createdAt));
+
+    const date = todayLocal.split('-');
+    return `${date[0]}년 ${date[1]}월 ${date[2]}일의 이야기`;
+};
 
 export default function MoodCalendarClient({
     initialJournals,
@@ -107,11 +118,11 @@ export default function MoodCalendarClient({
         router.push(`/journal/${journal.id}`);
     };
 
-    // 제목과 미리보기 추출 (복호화된 내용 사용)
-    const getTitle = (journal: Content) => {
-        const content = journal.decryptedContent ?? '';
-        return journal.question?.question || content.split('\n')[0] || '제목 없음';
-    };
+    // // 제목과 미리보기 추출 (복호화된 내용 사용)
+    // const getTitle = (journal: Content) => {
+    //     const content = journal.decryptedContent ?? '';
+    //     return journal.question?.question || content.split('\n')[0] || '제목 없음';
+    // };
 
     const getContentPreview = (journal: Content) => {
         const content = journal.decryptedContent ?? '';
@@ -135,7 +146,11 @@ export default function MoodCalendarClient({
                         dayOfWeek={selectedDate.toLocaleDateString('ko-KR', {
                             weekday: 'short',
                         })}
-                        title={getTitle(selectedJournal)}
+                        // journal.decryptedTitle || getTitle(journal.created_at);
+                        title={
+                            (selectedJournal.decryptedTitle ?? '') ||
+                            getTitle(selectedJournal.created_at)
+                        }
                         content={getContentPreview(selectedJournal)}
                         mood={selectedJournal.mood}
                         onClick={() => handleJournalClick(selectedJournal)}
