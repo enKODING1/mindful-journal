@@ -4,6 +4,7 @@ import JournalCard from '../molecules/JournalCard';
 import type { Content } from '@/domain/models';
 import JournalEmptyState from './JournalEmptyState';
 import { getTimeZone } from '@/domain/utils';
+import Link from 'next/link';
 
 export interface JournalListProps {
     journals: Content[];
@@ -113,7 +114,9 @@ export default function JournalList({ journals, onJournalClick }: JournalListPro
 
             {/* 빈 상태 */}
             {journals.length === 0 && (
-                <JournalEmptyState />
+                <Link href="/write">
+                    <JournalEmptyState />
+                </Link>
                 // <div className="text-center py-12 text-base-content/50">
                 //     <p className="text-lg">아직 작성된 일기가 없습니다.</p>
                 //     <p className="text-sm mt-2">첫 일기를 작성해보세요!</p>
