@@ -1,6 +1,11 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+    experimental: {
+        staleTimes: {
+            dynamic: 60 * 5, // 5분
+        },
+    },
     images: {
         remotePatterns: [
             {
