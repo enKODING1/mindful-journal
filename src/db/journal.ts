@@ -1,6 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Mood, Content, Question } from '@/domain/models';
 
+function mapQuestion(item: Record<string, unknown>): Content {
+    return { ...item, question: item.questions } as Content;
+}
+
 // 사용자별 전체 목록
 export async function listJournalsByUser(
     supabase: SupabaseClient,
@@ -25,11 +29,7 @@ export async function listJournalsByUser(
     const { data, error } = await query;
     if (error) throw error;
 
-    // questions를 question으로 매핑
-    return (data ?? []).map((item: Record<string, unknown>) => ({
-        ...item,
-        question: item.questions,
-    })) as Content[];
+    return (data ?? []).map(mapQuestion);
 }
 
 // 특정 날짜의 일기들
@@ -53,11 +53,7 @@ export async function getJournalByDate(supabase: SupabaseClient, ymd: string): P
 
     if (error) throw error;
 
-    // questions를 question으로 매핑
-    return (data ?? []).map((item: Record<string, unknown>) => ({
-        ...item,
-        question: item.questions,
-    })) as Content[];
+    return (data ?? []).map(mapQuestion);
 }
 
 // 특정 ID의 일기 가져오기
@@ -84,11 +80,7 @@ export async function getJournalById(
     if (error) throw error;
     if (!data) return null;
 
-    // questions를 question으로 매핑
-    return {
-        ...data,
-        question: data.questions,
-    } as Content;
+    return mapQuestion(data as Record<string, unknown>);
 }
 
 // 오늘 작성했는지 여부
