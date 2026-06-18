@@ -1,27 +1,18 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Profile } from '@/domain/models';
-import { UnauthorizedError, NotFoundError } from '@/domain/errors';
+import { NotFoundError } from '@/domain/errors';
 
-// 현재 로그인 사용자의 프로필 가져오기
 export async function getMyProfile(supabase: SupabaseClient): Promise<Profile> {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new UnauthorizedError();
-
     const { data, error } = await supabase.from('profiles').select('*').single();
     if (error) throw error;
     if (!data) throw new NotFoundError('프로필');
     return data as Profile;
 }
 
-// 현재 로그인 사용자의 프로필 없으면 생성
-export async function ensureMyProfile(supabase: SupabaseClient): Promise<Profile> {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new UnauthorizedError();
-
+export async function ensureMyProfile(
+    supabase: SupabaseClient,
+    user: { id: string; email?: string },
+): Promise<Profile> {
     const { data, error } = await supabase.from('profiles').select('*').single();
     if (!error && data) return data as Profile;
 
@@ -39,20 +30,15 @@ export async function ensureMyProfile(supabase: SupabaseClient): Promise<Profile
     return created as Profile;
 }
 
-// 프로필 업데이트(부분 업데이트)
 export async function updateMyProfile(
     supabase: SupabaseClient,
+    userId: string,
     payload: Partial<Pick<Profile, 'alias' | 'email' | 'avatar_url'>>,
 ): Promise<Profile> {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new UnauthorizedError();
-
     const { data, error } = await supabase
         .from('profiles')
         .update({ ...payload, updated_at: new Date().toISOString() })
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .select('*')
         .single();
 
