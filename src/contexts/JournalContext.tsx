@@ -88,7 +88,6 @@ export function JournalProvider({
         const initJournals = async () => {
             if (masterKey && initialJournals.length > 0 && !isInitialized) {
                 const decrypted = await decryptJournals(initialJournals, masterKey);
-                console.log(decrypted);
                 setJournals(decrypted);
                 setIsInitialized(true);
             } else if (masterKey && initialJournals.length === 0) {

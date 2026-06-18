@@ -118,12 +118,6 @@ export default function MoodCalendarClient({
         router.push(`/journal/${journal.id}`);
     };
 
-    // // 제목과 미리보기 추출 (복호화된 내용 사용)
-    // const getTitle = (journal: Content) => {
-    //     const content = journal.decryptedContent ?? '';
-    //     return journal.question?.question || content.split('\n')[0] || '제목 없음';
-    // };
-
     const getContentPreview = (journal: Content) => {
         const content = journal.decryptedContent ?? '';
         return content.split('\n').slice(0, 2).join(' ').trim();
@@ -146,7 +140,6 @@ export default function MoodCalendarClient({
                         dayOfWeek={selectedDate.toLocaleDateString('ko-KR', {
                             weekday: 'short',
                         })}
-                        // journal.decryptedTitle || getTitle(journal.created_at);
                         title={
                             (selectedJournal.decryptedTitle ?? '') ||
                             getTitle(selectedJournal.created_at)

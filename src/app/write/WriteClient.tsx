@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useCallback, useMemo, ChangeEvent } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import JournalForm from '@/components/ui/organisms/JournalForm';
 import Alert from '@/components/ui/atom/Alert';
-import { Content, Mood, Question } from '@/domain/models';
-import createClient from '@/db/supabase/client';
-import * as journalService from '@/services/journalService';
+import { Content, Mood } from '@/domain/models';
 import Input from '@/components/ui/atom/Input';
 import { hasWrittenToday as checkHasWrittenToday } from '@/domain/utils';
 import { encryptText } from '@/lib/crypto';
@@ -29,10 +27,9 @@ export default function WriteClient({ journals }: WriteClientProps) {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [title, setTitle] = useState(defaultTitle);
     const router = useRouter();
-    const supabase = useMemo(() => createClient(), []);
 
     const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitle(() => e.target.value);
+        setTitle(e.target.value);
     };
 
     const handleSubmit = useCallback(
@@ -40,17 +37,14 @@ export default function WriteClient({ journals }: WriteClientProps) {
             setLoading(true);
             setError(null);
             try {
-                // 1. localStorage에서 DEK 가져오기
                 const masterKey = getMasterKey();
                 if (!masterKey) {
                     throw new Error('암호화 키가 없습니다. 다시 로그인해주세요.');
                 }
 
-                // 2. 일기 내용 암호화
                 const encryptedContent = await encryptText(content, masterKey);
                 const encryptedTitle = await encryptText(title, masterKey);
 
-                // 4. 암호화된 일기 저장 (iv와 data 모두 저장)
                 const result = await fetch('/api/write', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -58,7 +52,6 @@ export default function WriteClient({ journals }: WriteClientProps) {
                         content: encryptedContent,
                         mood,
                         title: encryptedTitle,
-                        // questionId: question?.id,
                     }),
                 });
 
@@ -68,7 +61,6 @@ export default function WriteClient({ journals }: WriteClientProps) {
                 const resultJson = await result.json().then((res) => res.data);
 
                 setSuccessMessage('오늘의 이야기를 보관했어요!');
-                // 상세 페이지로 이동
                 router.push(`/journal/${resultJson.id}`);
             } catch (err) {
                 const message = err instanceof Error ? err.message : '일기 작성에 실패했습니다';
@@ -77,7 +69,7 @@ export default function WriteClient({ journals }: WriteClientProps) {
                 setLoading(false);
             }
         },
-        [supabase, router, handleTitle],
+        [router, title],
     );
 
     if (hasWrittenToday) {
@@ -92,9 +84,6 @@ export default function WriteClient({ journals }: WriteClientProps) {
 
     return (
         <div className="mt-16 max-w-2xl mx-auto px-4">
-            {/* 질문 */}
-            {/* <p className="text-lg text-base-content/80 mb-8 text-center">{`${title[0]}년 ${title[1]}월 ${title[2]}의 이야기`}</p> */}
-            {/* <p className="text-lg text-base-content/80 mb-8 text-center">{`${title[0]}년 ${title[1]}월 ${title[2]}의 이야기`}</p> */}
             <Input
                 inputSize="md"
                 value={title}
