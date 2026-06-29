@@ -1,0 +1,1 @@
+alter table contents add column char_count integer;

@@ -42,3 +42,8 @@ next-env.d.ts
 .vscode
 *storybook.log
 storybook-static
+
+# supabase
+supabase/.branches/
+supabase/.temp/
+supabase/.keys/

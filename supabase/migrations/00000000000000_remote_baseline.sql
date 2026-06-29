@@ -1,0 +1,785 @@
+
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+
+COMMENT ON SCHEMA "public" IS 'standard public schema';
+
+
+
+CREATE EXTENSION IF NOT EXISTS "pg_stat_statements" WITH SCHEMA "extensions";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA "extensions";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "supabase_vault" WITH SCHEMA "vault";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION "public"."disable_signup_trigger"() RETURNS "text"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+BEGIN
+  -- 관리자 권한으로 auth.users 테이블의 트리거를 비활성화합니다.
+  ALTER TABLE auth.users DISABLE TRIGGER on_auth_user_created;
+  RETURN 'Trigger on_auth_user_created has been disabled.';
+END;
+$$;
+
+
+ALTER FUNCTION "public"."disable_signup_trigger"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."drop_signup_trigger_and_function"() RETURNS "text"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+BEGIN
+  DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+  DROP FUNCTION IF EXISTS public.handle_new_user;
+  RETURN 'Trigger and function have been dropped.';
+END;
+$$;
+
+
+ALTER FUNCTION "public"."drop_signup_trigger_and_function"() OWNER TO "postgres";
+
+SET default_tablespace = '';
+
+SET default_table_access_method = "heap";
+
+
+CREATE TABLE IF NOT EXISTS "public"."questions" (
+    "id" bigint NOT NULL,
+    "question" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."questions" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."questions" IS '매일 물어볼 질문 목록';
+
+
+
+CREATE OR REPLACE FUNCTION "public"."get_next_question"() RETURNS SETOF "public"."questions"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+declare
+  answered_count int;
+begin
+  -- 1. 현재 로그인한 유저(auth.uid())가 답변한(question_id가 있는) 일기 개수를 셉니다.
+  select count(question_id)
+  into answered_count
+  from public.contents
+  where user_id = auth.uid();
+
+  -- 2. 질문 테이블을 정렬한 뒤, 답변한 개수만큼 건너뛰고(OFFSET) 1개를 가져옵니다.
+  return query
+  select *
+  from public.questions
+  order by id asc -- [중요] 만약 sort_order 컬럼을 만드셨다면 'order by sort_order asc'로 수정하세요!
+  limit 1
+  offset answered_count;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."get_next_question"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$begin
+      insert into public.profiles (user_id, email, alias, avatar_url)
+      values (
+        new.id,
+        new.email,
+        coalesce(
+            new.raw_user_meta_data->>'full_name',
+            new.raw_user_meta_data->>'name'
+        ),
+        new.raw_user_meta_data->>'avatar_url'
+
+      )
+      on conflict (user_id) do nothing;
+      return new;
+    end;$$;
+
+
+ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."rls_auto_enable"() RETURNS "event_trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'pg_catalog'
+    AS $$
+DECLARE
+  cmd record;
+BEGIN
+  FOR cmd IN
+    SELECT *
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('CREATE TABLE', 'CREATE TABLE AS', 'SELECT INTO')
+      AND object_type IN ('table','partitioned table')
+  LOOP
+     IF cmd.schema_name IS NOT NULL AND cmd.schema_name IN ('public') AND cmd.schema_name NOT IN ('pg_catalog','information_schema') AND cmd.schema_name NOT LIKE 'pg_toast%' AND cmd.schema_name NOT LIKE 'pg_temp%' THEN
+      BEGIN
+        EXECUTE format('alter table if exists %s enable row level security', cmd.object_identity);
+        RAISE LOG 'rls_auto_enable: enabled RLS on %', cmd.object_identity;
+      EXCEPTION
+        WHEN OTHERS THEN
+          RAISE LOG 'rls_auto_enable: failed to enable RLS on %', cmd.object_identity;
+      END;
+     ELSE
+        RAISE LOG 'rls_auto_enable: skip % (either system schema or not in enforced list: %.)', cmd.object_identity, cmd.schema_name;
+     END IF;
+  END LOOP;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."rls_auto_enable"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_updated_at_column"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."update_updated_at_column"() OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."ai_comments" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "comment" "jsonb" NOT NULL,
+    "content_id" "uuid" NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "model_version" "text"
+);
+
+
+ALTER TABLE "public"."ai_comments" OWNER TO "postgres";
+
+
+ALTER TABLE "public"."ai_comments" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."ai_comments_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."contents" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "content" "jsonb" NOT NULL,
+    "mood" "text",
+    "user_id" "uuid" NOT NULL,
+    "question_id" bigint,
+    "date" "date" NOT NULL,
+    "title" "jsonb"
+);
+
+
+ALTER TABLE "public"."contents" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."encryption_keys" (
+    "id" bigint NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "password_salt" "text" NOT NULL,
+    "encrypted_master_key" "jsonb" NOT NULL,
+    "verification_token" "jsonb" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone
+);
+
+
+ALTER TABLE "public"."encryption_keys" OWNER TO "postgres";
+
+
+ALTER TABLE "public"."encryption_keys" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."encryption_keys_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."profiles" (
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "alias" "text",
+    "user_id" "uuid" DEFAULT "gen_random_uuid"(),
+    "email" character varying,
+    "id" bigint NOT NULL,
+    "avatar_url" "text"
+);
+
+
+ALTER TABLE "public"."profiles" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."profiles" IS '프로필 정보 관리';
+
+
+
+COMMENT ON COLUMN "public"."profiles"."avatar_url" IS 'profile image';
+
+
+
+CREATE SEQUENCE IF NOT EXISTS "public"."profiles_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE "public"."profiles_id_seq" OWNER TO "postgres";
+
+
+ALTER SEQUENCE "public"."profiles_id_seq" OWNED BY "public"."profiles"."id";
+
+
+
+ALTER TABLE "public"."questions" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."questions_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+ALTER TABLE ONLY "public"."profiles" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."profiles_id_seq"'::"regclass");
+
+
+
+ALTER TABLE ONLY "public"."ai_comments"
+    ADD CONSTRAINT "ai_comments_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."contents"
+    ADD CONSTRAINT "contents_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."contents"
+    ADD CONSTRAINT "contents_user_date_unique" UNIQUE ("user_id", "date");
+
+
+
+ALTER TABLE ONLY "public"."encryption_keys"
+    ADD CONSTRAINT "encryption_keys_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."encryption_keys"
+    ADD CONSTRAINT "encryption_keys_user_id_unique" UNIQUE ("user_id");
+
+
+
+ALTER TABLE ONLY "public"."profiles"
+    ADD CONSTRAINT "profiles_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."profiles"
+    ADD CONSTRAINT "profiles_user_id_unique" UNIQUE ("user_id");
+
+
+
+ALTER TABLE ONLY "public"."questions"
+    ADD CONSTRAINT "questions_pkey" PRIMARY KEY ("id");
+
+
+
+CREATE INDEX "idx_ai_comments_content" ON "public"."ai_comments" USING "btree" ("content_id");
+
+
+
+CREATE INDEX "idx_ai_comments_user" ON "public"."ai_comments" USING "btree" ("user_id", "created_at" DESC);
+
+
+
+CREATE INDEX "idx_contents_user_date" ON "public"."contents" USING "btree" ("user_id", "date" DESC);
+
+
+
+CREATE OR REPLACE TRIGGER "update_encryption_keys_updated_at" BEFORE UPDATE ON "public"."encryption_keys" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+ALTER TABLE ONLY "public"."ai_comments"
+    ADD CONSTRAINT "ai_comments_content_id_fkey" FOREIGN KEY ("content_id") REFERENCES "public"."contents"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."ai_comments"
+    ADD CONSTRAINT "ai_comments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."contents"
+    ADD CONSTRAINT "contents_question_id_fkey" FOREIGN KEY ("question_id") REFERENCES "public"."questions"("id");
+
+
+
+ALTER TABLE ONLY "public"."contents"
+    ADD CONSTRAINT "contents_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."encryption_keys"
+    ADD CONSTRAINT "encryption_keys_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."profiles"
+    ADD CONSTRAINT "profiles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id");
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."questions" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Users can delete own ai comments" ON "public"."ai_comments" FOR DELETE USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can delete own contents" ON "public"."contents" FOR DELETE USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can insert own ai comments" ON "public"."ai_comments" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can insert own contents" ON "public"."contents" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can insert own encryption key" ON "public"."encryption_keys" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can update own contents" ON "public"."contents" FOR UPDATE USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can update own encryption key" ON "public"."encryption_keys" FOR UPDATE USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can view own ai comments" ON "public"."ai_comments" FOR SELECT USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can view own contents" ON "public"."contents" FOR SELECT USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Users can view own encryption key" ON "public"."encryption_keys" FOR SELECT USING (("auth"."uid"() = "user_id"));
+
+
+
+ALTER TABLE "public"."ai_comments" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."contents" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."encryption_keys" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."questions" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "사용자는 자신의 프로필에 업데이트를 할 수 있" ON "public"."profiles" FOR UPDATE USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "사용자만 데이터 삽입가능" ON "public"."profiles" FOR INSERT WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "사용자만 데이터 조회가능" ON "public"."profiles" FOR SELECT USING (("auth"."uid"() = "user_id"));
+
+
+
+
+
+ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
+
+
+GRANT USAGE ON SCHEMA "public" TO "postgres";
+GRANT USAGE ON SCHEMA "public" TO "anon";
+GRANT USAGE ON SCHEMA "public" TO "authenticated";
+GRANT USAGE ON SCHEMA "public" TO "service_role";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GRANT ALL ON FUNCTION "public"."disable_signup_trigger"() TO "anon";
+GRANT ALL ON FUNCTION "public"."disable_signup_trigger"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."disable_signup_trigger"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."drop_signup_trigger_and_function"() TO "anon";
+GRANT ALL ON FUNCTION "public"."drop_signup_trigger_and_function"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."drop_signup_trigger_and_function"() TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."questions" TO "anon";
+GRANT ALL ON TABLE "public"."questions" TO "authenticated";
+GRANT ALL ON TABLE "public"."questions" TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."get_next_question"() TO "anon";
+GRANT ALL ON FUNCTION "public"."get_next_question"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_next_question"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "anon";
+GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."rls_auto_enable"() TO "anon";
+GRANT ALL ON FUNCTION "public"."rls_auto_enable"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."rls_auto_enable"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_updated_at_column"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_updated_at_column"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_updated_at_column"() TO "service_role";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GRANT ALL ON TABLE "public"."ai_comments" TO "anon";
+GRANT ALL ON TABLE "public"."ai_comments" TO "authenticated";
+GRANT ALL ON TABLE "public"."ai_comments" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."ai_comments_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."ai_comments_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."ai_comments_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."contents" TO "anon";
+GRANT ALL ON TABLE "public"."contents" TO "authenticated";
+GRANT ALL ON TABLE "public"."contents" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."encryption_keys" TO "anon";
+GRANT ALL ON TABLE "public"."encryption_keys" TO "authenticated";
+GRANT ALL ON TABLE "public"."encryption_keys" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."encryption_keys_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."encryption_keys_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."encryption_keys_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."profiles" TO "anon";
+GRANT ALL ON TABLE "public"."profiles" TO "authenticated";
+GRANT ALL ON TABLE "public"."profiles" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."profiles_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."profiles_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."profiles_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."questions_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."questions_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."questions_id_seq" TO "service_role";
+
+
+
+
+
+
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "service_role";
+
+
+
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "service_role";
+
+
+
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "service_role";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
