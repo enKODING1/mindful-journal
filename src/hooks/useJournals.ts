@@ -76,6 +76,7 @@ export function useJournals() {
             content: { iv: string; data: string },
             mood: Mood,
             title: { iv: string; data: string },
+            charCount: number,
         ) => {
             setLoading(true);
             setError(null);
@@ -84,6 +85,7 @@ export function useJournals() {
                     content,
                     mood,
                     title,
+                    charCount,
                 });
                 // 성공 후 새로고침 또는 리다이렉트
                 router.refresh();
