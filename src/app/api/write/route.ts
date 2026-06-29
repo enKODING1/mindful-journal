@@ -6,7 +6,7 @@ import { getToday } from '@/lib/utils';
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { content, mood, title } = body;
+        const { content, mood, title, charCount } = body;
         if (!content || !mood) {
             return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
         }
@@ -16,6 +16,7 @@ export async function POST(req: Request) {
             mood,
             title,
             date: getToday(),
+            charCount,
         });
 
         return NextResponse.json({ success: true, data: result });

@@ -29,6 +29,7 @@ export async function createJournal(
         mood: Mood;
         title: { iv: string; data: string };
         date?: string;
+        charCount: number;
     },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
     // Get current user
@@ -51,6 +52,7 @@ export async function createJournal(
         title: input.title,
         // questionId: input.questionId,
         date: input.date,
+        charCount: input.charCount,
     });
 }
 

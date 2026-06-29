@@ -52,6 +52,7 @@ export default function WriteClient({ journals }: WriteClientProps) {
                         content: encryptedContent,
                         mood,
                         title: encryptedTitle,
+                        charCount: content.length,
                     }),
                 });
 

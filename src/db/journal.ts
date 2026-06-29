@@ -111,6 +111,7 @@ export async function createJournal(
         // questionId?: number;
         title: { iv: string; data: string };
         date?: string;
+        charCount: number;
     },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
     const { data, error } = await supabase
@@ -122,6 +123,7 @@ export async function createJournal(
             title: input.title,
             // question_id: input.questionId,
             date: input.date,
+            char_count: input.charCount,
         })
         .select('id, created_at')
         .single();
