@@ -111,6 +111,7 @@ export async function createJournal(
         // questionId?: number;
         title: { iv: string; data: string };
         date?: string;
+        entry_date?: string;
         charCount: number;
     },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
@@ -123,6 +124,7 @@ export async function createJournal(
             title: input.title,
             // question_id: input.questionId,
             date: input.date,
+            entry_date: input.date,
             char_count: input.charCount,
         })
         .select('id, created_at')

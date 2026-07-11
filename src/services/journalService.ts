@@ -29,6 +29,7 @@ export async function createJournal(
         mood: Mood;
         title: { iv: string; data: string };
         date?: string;
+        entry_date?: string;
         charCount: number;
     },
 ): Promise<Pick<Content, 'id' | 'created_at'>> {
@@ -52,6 +53,7 @@ export async function createJournal(
         title: input.title,
         // questionId: input.questionId,
         date: input.date,
+        entry_date: input.date,
         charCount: input.charCount,
     });
 }

@@ -16,6 +16,7 @@ export async function POST(req: Request) {
             mood,
             title,
             date: date ?? getToday(),
+            entry_date: date ?? getToday(),
             charCount,
         });
 
