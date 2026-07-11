@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Mood, Content, Question } from '@/domain/models';
+import { Mood, Content, Question, JournalStats } from '@/domain/models';
 
 function mapQuestion(item: Record<string, unknown>): Content {
     return { ...item, question: item.questions } as Content;
@@ -178,5 +178,16 @@ export async function getNextQuestion(supabase: SupabaseClient): Promise<Questio
         return data[0];
     }
 
+    return data;
+}
+
+export async function getJournalStat(
+    supabase: SupabaseClient,
+    p_today: string,
+): Promise<JournalStats> {
+    const { data, error } = await supabase.rpc('get_journal_stats_by_period', { p_today });
+    console.log(data);
+    console.log(error);
+    if (error) throw error;
     return data;
 }

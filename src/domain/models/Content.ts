@@ -21,3 +21,16 @@ export interface Content {
 export type ContentsByMood = Record<Mood, Content[]>;
 export type SimplifiedContent = Pick<Content, 'created_at' | 'content'>;
 export type SimplifiedContentsByMood = Record<Mood, SimplifiedContent[]>;
+
+export type JournalStat = {
+    journalCount: number;
+    currentStreak: number;
+    longestStreak: number;
+    avgWordCount: number;
+};
+
+export type JournalStats = {
+    week: JournalStat;
+    month: JournalStat;
+    year: JournalStat;
+};

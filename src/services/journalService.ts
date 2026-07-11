@@ -1,6 +1,6 @@
 import * as JournalRepo from '@/db/journal';
 import * as DomainUtil from '@/domain/utils/';
-import { Content, Mood, Question } from '@/domain/models';
+import { Content, Mood, Question, JournalStats } from '@/domain/models';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export async function listJournalsByUser(
@@ -90,4 +90,18 @@ export async function addAIComment(
         userId: user.id,
         modelVersion: input.modelVersion,
     });
+}
+
+export async function getJournalStat(
+    supabase: SupabaseClient,
+    p_today: string,
+): Promise<JournalStats> {
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+        throw new Error('로그인이 필요합니다');
+    }
+    return JournalRepo.getJournalStat(supabase, p_today);
 }
