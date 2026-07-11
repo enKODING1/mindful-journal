@@ -4,7 +4,6 @@ import StatClient from './StatClient';
 
 export default async function StatPage() {
     const supabase = await createServerClient();
-    const journals = await journalService.listJournalsByUser(supabase);
-
-    return <StatClient initialJournals={journals} />;
+    const journalStat = await journalService.getJournalStat(supabase, '2026-01-27');
+    return <StatClient initialJournals={journalStat} />;
 }

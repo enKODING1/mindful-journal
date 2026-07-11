@@ -194,3 +194,16 @@ export function calculateMonthlyTrend(contents: Content[]): Array<{
 
     return monthlyData;
 }
+
+export function toMoodStats(
+    moods: Record<string, number>,
+    total: number, // 해당 기간 count
+): MoodStat[] {
+    return Object.entries(moods)
+        .map(([mood, count]) => ({
+            mood: mood as Mood,
+            count,
+            percentage: total > 0 ? Math.round((count / total) * 100) : 0,
+        }))
+        .sort((a, b) => b.count - a.count); // 많은 순 정렬 (before와 동일한 UX)
+}

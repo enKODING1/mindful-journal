@@ -1,6 +1,7 @@
 'use client';
 
 import StatCard from '../molecules/StatCard';
+import { JournalStat } from '@/domain/models';
 
 export interface JournalStatsData {
     totalCount: number;
@@ -10,7 +11,7 @@ export interface JournalStatsData {
 }
 
 export interface JournalStatsProps {
-    stats: JournalStatsData;
+    stats: JournalStat;
     className?: string;
 }
 
@@ -18,7 +19,7 @@ export default function JournalStats({ stats, className = '' }: JournalStatsProp
     return (
         <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 ${className} `}>
             <StatCard
-                title={stats.totalCount.toString()}
+                title={stats.count.toString()}
                 text="총 일기 수"
                 color="secondary"
                 size="xs"

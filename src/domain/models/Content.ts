@@ -22,11 +22,14 @@ export type ContentsByMood = Record<Mood, Content[]>;
 export type SimplifiedContent = Pick<Content, 'created_at' | 'content'>;
 export type SimplifiedContentsByMood = Record<Mood, SimplifiedContent[]>;
 
+export type MoodCounts = Record<Mood, number>;
+
 export type JournalStat = {
-    journalCount: number;
+    count: number;
     currentStreak: number;
     longestStreak: number;
     avgWordCount: number;
+    moods: MoodCounts;
 };
 
 export type JournalStats = {
