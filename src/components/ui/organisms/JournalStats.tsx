@@ -17,7 +17,7 @@ export interface JournalStatsProps {
 
 export default function JournalStats({ stats, className = '' }: JournalStatsProps) {
     return (
-        <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 ${className} `}>
+        <div className={`grid grid-cols-2 sm:grid-cols-2 gap-2 ${className} `}>
             <StatCard
                 title={stats.count.toString()}
                 text="총 일기 수"
@@ -26,13 +26,13 @@ export default function JournalStats({ stats, className = '' }: JournalStatsProp
                 className="bg-base-200"
             />
             <StatCard
-                title={stats.currentStreak.toString()}
-                text="연속 작성일"
+                title={stats.totalWordCount.toString()}
+                text="총 단어 수"
                 color="secondary"
                 size="xs"
                 className="bg-base-200"
             />
-            <StatCard
+            {/* <StatCard
                 title={stats.longestStreak.toString()}
                 text="최장 연속일"
                 color="secondary"
@@ -45,7 +45,7 @@ export default function JournalStats({ stats, className = '' }: JournalStatsProp
                 color="secondary"
                 size="xs"
                 className="bg-base-200"
-            />
+            /> */}
         </div>
     );
 }

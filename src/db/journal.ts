@@ -187,7 +187,7 @@ export async function getJournalStat(
     supabase: SupabaseClient,
     p_today: string,
 ): Promise<JournalStats> {
-    const { data, error } = await supabase.rpc('get_journal_stats_by_period', { p_today });
+    const { data, error } = await supabase.rpc('get_journal_stats', { p_today });
     console.log(data);
     console.log(error);
     if (error) throw error;

@@ -26,14 +26,15 @@ export type MoodCounts = Record<Mood, number>;
 
 export type JournalStat = {
     count: number;
-    currentStreak: number;
-    longestStreak: number;
-    avgWordCount: number;
+    totalWordCount: number;
     moods: MoodCounts;
 };
 
 export type JournalStats = {
+    currentStreak: number;
+    longestStreak: number;
     week: JournalStat;
     month: JournalStat;
     year: JournalStat;
+    all: JournalStat;
 };

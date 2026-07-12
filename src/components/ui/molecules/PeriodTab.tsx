@@ -2,7 +2,7 @@
 
 import TabGroup from './TabGroup';
 
-type Period = 'week' | 'month' | 'year';
+type Period = 'week' | 'month' | 'year' | 'all';
 
 export type PeriodTabProps = {
     value?: Period;
@@ -11,9 +11,10 @@ export type PeriodTabProps = {
 };
 
 const periodTabs: { label: string; value: Period }[] = [
-    { label: '이번 주', value: 'week' },
-    { label: '이번 달', value: 'month' },
-    { label: '올해', value: 'year' },
+    { label: '주', value: 'week' },
+    { label: '달', value: 'month' },
+    { label: '년', value: 'year' },
+    { label: '전체', value: 'all' },
 ];
 
 export default function PeriodTab({ value, defaultValue = 'week', onChange }: PeriodTabProps) {
